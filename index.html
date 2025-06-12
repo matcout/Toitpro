@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<title>Toit Pro</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+<style>
+    :root {
+      --primary: #3498db;
+      --secondary: #2c3e50;
+      --light: #f8f9fa;
+      --success: #27ae60;
+      --warning: #f39c12;
+      --danger: #e74c3c;
+      --border: #dfe6e9;
+      --text: #333;
+      --bg-section: #f5f7fa;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: #f0f2f5;
+      color: var(--text);
+      line-height: 1.6;
+      padding: 0;
+      margin: 0;
+      -webkit-text-size-adjust: 100%;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    .container {
+      max-width: 100%;
+      padding: 15px;
+      padding-bottom: calc(15px + env(safe-area-inset-bottom));
+    }
+    
+    header {
+      background: linear-gradient(135deg, var(--secondary), #1a2530);
+      padding: 20px 15px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      color: white;
+      padding-top: max(20px, env(safe-area-inset-top));
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .logo h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+    }
+    
+    .logo i {
+      font-size: 2rem;
+    }
+    
+    .search-container {
+      margin: 15px 0;
+      position: relative;
+    }
+    
+    .search-container input {
+      width: 100%;
+      padding: 12px 15px 12px 40px;
+      border: 1px solid var(--border);
+      border-radius: 25px;
+      font-size: 1rem;
+      background-color: white;
+    }
+    
+    .search-container i {
+      position: absolute;
+      left: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--secondary);
+    }
+    
+    .folder-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .folder-item {
+      display: flex;
+      align-items: center;
+      padding: 15px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+    }
+    
+    .folder-item:last-child {
+      border-bottom: none;
+    }
+    
+    .folder-icon {
+      width: 40px;
+      height: 40px;
+      background-color: var(--primary);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+    
+    .folder-content {
+      flex-grow: 1;
+    }
+    
+    .folder-content h3 {
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+    }
+    
+    .folder-content p {
+      color: #7f8c8d;
+      font-size: 0.9rem;
+    }
+    
+    .folder-arrow {
+      color: var(--secondary);
+    }
+    
+    .notification {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 16px 30px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 500;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      z-index: 1000;
+      opacity: 0;
+      transition: opacity 0.3s, bottom 0.3s;
+      max-width: 90%;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .notification.show {
+      opacity: 1;
+      bottom: max(40px, env(safe-area-inset-bottom) + 10px);
+    }
+    
+    .notification.success {
+      background: var(--success);
+    }
+    
+    .notification.error {
+      background: var(--danger);
+    }
+    
+    .notification i {
+      font-size: 1.4rem;
+    }
+    
+    /* Styles pour le formulaire de soumission */
+    .form-container {
+      display: none;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .form-section {
+      margin-bottom: 25px;
+      padding: 20px;
+      border-radius: 8px;
+      background-color: var(--bg-section);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .section-title {
+      font-size: 1.25rem;
+      color: var(--secondary);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .section-title i {
+      font-size: 1.4rem;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: var(--secondary);
+      font-size: 0.95rem;
+    }
+    
+    .required::after {
+      content: " *";
+      color: var(--danger);
+    }
+    
+    input[type="text"],
+    input[type="tel"],
+    input[type="email"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 15px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 1rem;
+      background-color: white;
+      -webkit-appearance: none;
+      appearance: none;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+    
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    select {
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232c3e50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+    }
+    
+    .dimensions-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    
+    .dimensions-row select {
+      flex: 1;
+    }
+    
+    .dimensions-row span {
+      font-weight: bold;
+      color: var(--primary);
+      font-size: 1.2rem;
+      width: 24px;
+      text-align: center;
+    }
+    
+    output {
+      display: block;
+      padding: 14px;
+      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-align: center;
+      color: var(--secondary);
+      border: 1px solid var(--border);
+    }
+    
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .grid-3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .button-container {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+      justify-content: center;
+    }
+    
+    .btn {
+      padding: 15px 25px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.3s;
+      min-width: 180px;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+    
+    .btn i {
+      font-size: 1.2rem;
+    }
+    
+    .btn-save {
+      background: var(--success);
+      color: white;
+      box-shadow: 0 4px 6px rgba(46, 204, 113, 0.3);
+    }
+    
+    .btn-save:hover, .btn-save:active {
+      background: #219653;
+      transform: translateY(-2px);
+    }
+    
+    .btn-reset {
+      background: white;
+      color: var(--secondary);
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    
+    .btn-reset:hover, .btn-reset:active {
+      background: #f8f9fa;
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    
+    .btn-back {
+      background: var(--secondary);
+      color: white;
+      margin-bottom: 20px;
+    }
+    
+    /* Support du notch et de la safe area */
+    @supports (padding: max(0px)) {
+      body, header, .container {
+        padding-left: max(15px, env(safe-area-inset-left));
+        padding-right: max(15px, env(safe-area-inset-right));
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .grid-3 {
+        grid-template-columns: 1fr 1fr;
+      }
+      
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+      
+      .button-container {
+        flex-direction: column;
+        gap: 12px;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+<link href="manifest.json" rel="manifest"/></head>
+<body>
+<div class="container">
+<header>
+<div class="logo">
+<i class="fas fa-home"></i>
+<h1>Toit Pro</h1>
+</div>
+</header>
+<!-- Page principale - Liste des dossiers -->
+<div id="main-page">
+<div class="search-container">
+<i class="fas fa-search"></i>
+<input id="search-input" placeholder="Rechercher un dossier..." type="text"/>
+</div>
+<div class="folder-container">
+<div class="folder-item" onclick="openYearFolder('2023')">
+<div class="folder-icon">
+<i class="fas fa-folder"></i>
+</div>
+<div class="folder-content">
+<h3>2023</h3>
+<p>12 dossiers</p>
+</div>
+<div class="folder-arrow">
+<i class="fas fa-chevron-right"></i>
+</div>
+</div>
+<div class="folder-item" onclick="openYearFolder('2022')">
+<div class="folder-icon">
+<i class="fas fa-folder"></i>
+</div>
+<div class="folder-content">
+<h3>2022</h3>
+<p>8 dossiers</p>
+</div>
+<div class="folder-arrow">
+<i class="fas fa-chevron-right"></i>
+</div>
+</div>
+<div class="folder-item" onclick="openYearFolder('2021')">
+<div class="folder-icon">
+<i class="fas fa-folder"></i>
+</div>
+<div class="folder-content">
+<h3>2021</h3>
+<p>5 dossiers</p>
+</div>
+<div class="folder-arrow">
+<i class="fas fa-chevron-right"></i>
+</div>
+</div>
+</div>
+<!-- Bouton pour crÃ©er une nouvelle soumission -->
+<button class="btn btn-save" onclick="showForm()" style="width: 100%;">
+<i class="fas fa-plus"></i> Nouvelle soumission
+      </button>
+</div>
+<!-- Page du formulaire de soumission -->
+<div id="form-page" style="display: none;">
+<button class="btn btn-back" onclick="hideForm()">
+<i class="fas fa-arrow-left"></i> Retour aux dossiers
+      </button>
+<form id="soumissionForm">
+<!-- Section Informations client -->
+<div class="form-section">
+<h2 class="section-title">
+<i class="fas fa-user"></i>
+            Informations client
+          </h2>
+<label class="required" for="nom">Nom du client :</label>
+<input id="nom" name="nom" placeholder="Nom complet" required="" type="text"/>
+<label class="required" for="adresse">Adresse des travaux :</label>
+<input id="adresse" name="adresse" placeholder="Adresse complÃ¨te" required="" type="text"/>
+<div class="grid-2">
+<div>
+<label class="required" for="telephone">TÃ©lÃ©phone :</label>
+<input id="telephone" name="telephone" placeholder="(123) 456-7890" required="" type="tel"/>
+</div>
+<div>
+<label class="required" for="courriel">Courriel :</label>
+<input id="courriel" name="courriel" placeholder="email@exemple.com" required="" type="email"/>
+</div>
+</div>
+</div>
+<!-- Section Dimensions -->
+<div class="form-section">
+<h2 class="section-title">
+<i class="fas fa-ruler-combined"></i>
+            Dimensions de la toiture
+          </h2>
+<div class="dimensions-row">
+<select id="dimension1" name="dimension1" onchange="calculerSuperficie()">
+<option value="0">Longueur 1</option>
+</select>
+<span>Ã</span>
+<select id="dimension2" name="dimension2" onchange="calculerSuperficie()">
+<option value="0">Largeur 1</option>
+</select>
+</div>
+<div class="dimensions-row">
+<select id="dimension3" name="dimension3" onchange="calculerSuperficie()">
+<option value="0">Longueur 2</option>
+</select>
+<span>Ã</span>
+<select id="dimension4" name="dimension4" onchange="calculerSuperficie()">
+<option value="0">Largeur 2</option>
+</select>
+</div>
+<div class="superficie-container">
+<label>Superficie totale :</label>
+<output id="superficie">0</output>
+</div>
+<div class="form-note">Saisissez les dimensions de chaque section de toiture en pieds</div>
+</div>
+<!-- Section MatÃ©riaux -->
+<div class="form-section">
+<h2 class="section-title">
+<i class="fas fa-tools"></i>
+            MatÃ©riaux et accessoires
+          </h2>
+<div class="grid-3">
+<div>
+<label for="nbFeuilles">Feuilles de tÃ´les</label>
+<select id="nbFeuilles" name="nbFeuilles"></select>
+</div>
+<div>
+<label for="nbMax">Maximum</label>
+<select id="nbMax" name="nbMax"></select>
+</div>
+<div>
+<label for="nbEvents">Ãvents</label>
+<select id="nbEvents" name="nbEvents"></select>
+</div>
+<div>
+<label for="nbDrains">Drains</label>
+<select id="nbDrains" name="nbDrains"></select>
+</div>
+<div>
+<label for="trepiedElectrique">TrÃ©pied Ã©lectrique</label>
+<select id="trepiedElectrique" name="trepiedElectrique"></select>
+</div>
+<div>
+<label for="ff180">180FF</label>
+<select id="ff180" name="ff180"></select>
+</div>
+<div>
+<label for="armorbound180">Armorbound 180</label>
+<select id="armorbound180" name="armorbound180"></select>
+</div>
+</div>
+<!-- Section Puit de lumiÃ¨re 1 -->
+<div class="puit-lumiere-container">
+<label>Puit de lumiÃ¨re 1</label>
+<div class="puit-lumiere-row">
+<select id="puitLumiere1Dim1" name="puitLumiere1Dim1" onchange="calculerSuperficie()">
+<option value="0">Longueur</option>
+</select>
+<span>Ã</span>
+<select id="puitLumiere1Dim2" name="puitLumiere1Dim2" onchange="calculerSuperficie()">
+<option value="0">Largeur</option>
+</select>
+</div>
+</div>
+<!-- Section Puit de lumiÃ¨re 2 -->
+<div class="puit-lumiere-container" style="margin-top: 15px;">
+<label>Puit de lumiÃ¨re 2</label>
+<div class="puit-lumiere-row">
+<select id="puitLumiere2Dim1" name="puitLumiere2Dim1" onchange="calculerSuperficie()">
+<option value="0">Longueur</option>
+</select>
+<span>Ã</span>
+<select id="puitLumiere2Dim2" name="puitLumiere2Dim2" onchange="calculerSuperficie()">
+<option value="0">Largeur</option>
+</select>
+</div>
+</div>
+<div class="form-note">Les puits de lumiÃ¨re seront dÃ©duits de la superficie totale</div>
+</div>
+<!-- Section Photos -->
+<div class="form-section">
+<h2 class="section-title">
+<i class="fas fa-camera"></i>
+            Photos du projet
+          </h2>
+<div class="photos-container">
+<p>Prenez des photos de la toiture pour documenter votre projet</p>
+<div class="photos-grid">
+<!-- Les photos seront ajoutÃ©es ici dynamiquement -->
+<div class="photo-item">
+<div class="photo-placeholder" onclick="takePhoto()">
+<i class="fas fa-plus-circle"></i>
+<span>Ajouter</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section Autres -->
+<div class="form-section">
+<h2 class="section-title">
+<i class="fas fa-cogs"></i>
+            Autres options
+          </h2>
+<div class="checkbox-container">
+<div class="checkbox-item">
+<input id="plusieursEpaisseurs" name="plusieursEpaisseurs" type="checkbox"/>
+<label for="plusieursEpaisseurs">Plusieurs Ã©paisseurs de toiture</label>
+</div>
+<div class="checkbox-item">
+<input id="hydroQuebec" name="hydroQuebec" type="checkbox"/>
+<label for="hydroQuebec">Travaux Hydro QuÃ©bec requis</label>
+</div>
+<div class="checkbox-item">
+<input id="grue" name="grue" type="checkbox"/>
+<label for="grue">Grue nÃ©cessaire</label>
+</div>
+<div class="checkbox-item">
+<input id="trackfall" name="trackfall" type="checkbox"/>
+<label for="trackfall">Trackfall et chute</label>
+</div>
+</div>
+</div>
+<!-- Notes supplÃ©mentaires -->
+<div class="form-section">
+<h2 class="section-title">
+<i class="fas fa-sticky-note"></i>
+            Notes supplÃ©mentaires
+          </h2>
+<label for="notes">DÃ©tails, observations ou instructions spÃ©ciales :</label>
+<textarea id="notes" name="notes" placeholder="DÃ©crivez ici toute information supplÃ©mentaire importante..."></textarea>
+</div>
+<!-- Boutons -->
+<div class="button-container">
+<button class="btn btn-save" onclick="enregistrerSoumission()" type="button">
+<i class="fas fa-save"></i> Enregistrer la soumission
+          </button>
+<button class="btn btn-reset" onclick="resetForm()" type="button">
+<i class="fas fa-redo"></i> RÃ©initialiser
+          </button>
+</div>
+</form>
+</div>
+<!-- Page des dossiers par annÃ©e -->
+<div id="year-page" style="display: none;">
+<button class="btn btn-back" onclick="backToMain()">
+<i class="fas fa-arrow-left"></i> Retour
+      </button>
+<div class="folder-container" id="year-folders">
+<!-- Les sous-dossiers seront gÃ©nÃ©rÃ©s dynamiquement ici -->
+</div>
+</div>
+</div>
+<div class="notification" id="notification">
+<i class="fas fa-check-circle"></i>
+<span id="notificationMessage"></span>
+</div>
+<script>
+    // Base de donnÃ©es simulÃ©e
+    let soumissionsDB = JSON.parse(localStorage.getItem('soumissionsDB')) || [];
+    
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', function() {
+      populateSelects();
+      setupSearch();
+    });
+    
+    // Configuration de la recherche
+    function setupSearch() {
+      const searchInput = document.getElementById('search-input');
+      searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        const folders = document.querySelectorAll('.folder-item');
+        
+        folders.forEach(folder => {
+          const title = folder.querySelector('h3').textContent.toLowerCase();
+          if (title.includes(searchTerm)) {
+            folder.style.display = 'flex';
+          } else {
+            folder.style.display = 'none';
+          }
+        });
+      });
+    }
+    
+    // Afficher le formulaire
+    function showForm() {
+      document.getElementById('main-page').style.display = 'none';
+      document.getElementById('form-page').style.display = 'block';
+      document.getElementById('year-page').style.display = 'none';
+    }
+    
+    // Masquer le formulaire
+    function hideForm() {
+      document.getElementById('main-page').style.display = 'block';
+      document.getElementById('form-page').style.display = 'none';
+      document.getElementById('year-page').style.display = 'none';
+    }
+    
+    // Ouvrir un dossier annÃ©e
+    function openYearFolder(year) {
+      document.getElementById('main-page').style.display = 'none';
+      document.getElementById('form-page').style.display = 'none';
+      document.getElementById('year-page').style.display = 'block';
+      
+      const yearFolders = document.getElementById('year-folders');
+      yearFolders.innerHTML = `
+        <div class="folder-item" onclick="openSubFolder('${year}', 'Soumission')">
+          <div class="folder-icon" style="background-color: var(--primary);">
+            <i class="fas fa-file-signature"></i>
+          </div>
+          <div class="folder-content">
+            <h3>Soumission</h3>
+            <p>Documents de soumission</p>
+          </div>
+          <div class="folder-arrow">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
+        
+        <div class="folder-item" onclick="openSubFolder('${year}', 'Contrat')">
+          <div class="folder-icon" style="background-color: var(--success);">
+            <i class="fas fa-file-contract"></i>
+          </div>
+          <div class="folder-content">
+            <h3>Contrat</h3>
+            <p>Contrats signÃ©s</p>
+          </div>
+          <div class="folder-arrow">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
+        
+        <div class="folder-item" onclick="openSubFolder('${year}', 'Reparage')">
+          <div class="folder-icon" style="background-color: var(--warning);">
+            <i class="fas fa-tools"></i>
+          </div>
+          <div class="folder-content">
+            <h3>RÃ©parage</h3>
+            <p>Documents de rÃ©paration</p>
+          </div>
+          <div class="folder-arrow">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
+        
+        <div class="folder-item" onclick="openSubFolder('${year}', 'Inspection')">
+          <div class="folder-icon" style="background-color: var(--danger);">
+            <i class="fas fa-search"></i>
+          </div>
+          <div class="folder-content">
+            <h3>Inspection</h3>
+            <p>Rapports d'inspection</p>
+          </div>
+          <div class="folder-arrow">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
+      `;
+    }
+    
+    // Ouvrir un sous-dossier
+    function openSubFolder(year, type) {
+      // Ici vous pouvez implÃ©menter la logique pour afficher les documents spÃ©cifiques
+      showNotification(`Ouverture des ${type} pour ${year}`, 'success');
+    }
+    
+    // Retour Ã  la page principale
+    function backToMain() {
+      document.getElementById('main-page').style.display = 'block';
+      document.getElementById('form-page').style.display = 'none';
+      document.getElementById('year-page').style.display = 'none';
+    }
+    
+    // Remplir les sÃ©lecteurs
+    function populateSelects() {
+      // Dimensions principales (0 Ã  200)
+      const dimensionSelects = document.querySelectorAll('select[id^="dimension"]');
+      
+      dimensionSelects.forEach(select => {
+        // Conserver l'option par dÃ©faut
+        const defaultOption = select.options[0];
+        select.innerHTML = '';
+        select.appendChild(defaultOption);
+        
+        // Ajouter les options de 1 Ã  200
+        for (let i = 1; i <= 200; i++) {
+          const option = document.createElement('option');
+          option.value = i;
+          option.textContent = i;
+          select.appendChild(option);
+        }
+      });
+      
+      // Autres sÃ©lecteurs (0 Ã  50)
+      const smallSelects = [
+        'nbFeuilles', 'nbMax', 'nbEvents', 'nbDrains',
+        'trepiedElectrique', 'ff180', 'armorbound180'
+      ];
+      
+      smallSelects.forEach(id => {
+        const select = document.getElementById(id);
+        for (let i = 0; i <= 50; i++) {
+          const option = document.createElement('option');
+          option.value = i;
+          option.textContent = i;
+          select.appendChild(option);
+        }
+      });
+    }
+    
+    // Calcul de la superficie
+    function calculerSuperficie() {
+      const dim1 = parseFloat(document.getElementById('dimension1').value) || 0;
+      const dim2 = parseFloat(document.getElementById('dimension2').value) || 0;
+      const dim3 = parseFloat(document.getElementById('dimension3').value) || 0;
+      const dim4 = parseFloat(document.getElementById('dimension4').value) || 0;
+      
+      const superficieTotale = (dim1 * dim2) + (dim3 * dim4);
+      document.getElementById('superficie').textContent = superficieTotale;
+    }
+    
+    // RÃ©initialisation
+    function resetForm() {
+      document.getElementById('soumissionForm').reset();
+      document.getElementById('superficie').textContent = '0';
+      showNotification('Formulaire rÃ©initialisÃ© avec succÃ¨s', 'success');
+    }
+    
+    // Notifications
+    function showNotification(message, type) {
+      const notification = document.getElementById('notification');
+      const messageElement = document.getElementById('notificationMessage');
+      const icon = notification.querySelector('i');
+      
+      // Changer l'icÃ´ne selon le type
+      if (type === 'success') {
+        icon.className = 'fas fa-check-circle';
+      } else {
+        icon.className = 'fas fa-exclamation-circle';
+      }
+      
+      messageElement.textContent = message;
+      notification.className = `notification ${type} show`;
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+    
+    // Enregistrement
+    function enregistrerSoumission() {
+      const adresse = document.getElementById('adresse').value.trim();
+      if (!adresse) {
+        showNotification('Veuillez saisir une adresse', 'error');
+        return;
+      }
+      
+      const soumission = {
+        id: 'soum_' + Date.now(),
+        date: new Date().toLocaleDateString('fr-CA'),
+        annee: new Date().getFullYear(),
+        type: 'Soumission',
+        client: {
+          nom: document.getElementById('nom').value,
+          adresse: adresse,
+          telephone: document.getElementById('telephone').value,
+          courriel: document.getElementById('courriel').value
+        },
+        toiture: {
+          dimensions: [
+            { valeur: document.getElementById('dimension1').value },
+            { valeur: document.getElementById('dimension2').value },
+            { valeur: document.getElementById('dimension3').value },
+            { valeur: document.getElementById('dimension4').value }
+          ],
+          superficie_totale: document.getElementById('superficie').textContent,
+          plusieurs_epaisseurs: document.getElementById('plusieursEpaisseurs').checked
+        },
+        materiaux: {
+          feuilles: document.getElementById('nbFeuilles').value,
+          max: document.getElementById('nbMax').value,
+          events: document.getElementById('nbEvents').value,
+          drains: document.getElementById('nbDrains').value,
+          trepied_electrique: document.getElementById('trepiedElectrique').value,
+          ff180: document.getElementById('ff180').value,
+          armorbound180: document.getElementById('armorbound180').value
+        },
+        options: {
+          hydro_quebec: document.getElementById('hydroQuebec').checked,
+          grue: document.getElementById('grue').checked,
+          trackfall: document.getElementById('trackfall').checked
+        },
+        notes: document.getElementById('notes').value
+      };
+      
+      // Sauvegarder dans la base de donnÃ©es
+      soumissionsDB.push(soumission);
+      localStorage.setItem('soumissionsDB', JSON.stringify(soumissionsDB));
+      
+      showNotification(`Soumission enregistrÃ©e pour ${soumission.client.nom}`, 'success');
+      resetForm();
+      hideForm();
+    }
+  </script>
+<script>
+    // Stockage des photos
+    let projectPhotos = [];
+    let photoCounter = 0;
+
+    // Initialisation
+    document.addEventListener('DOMContentLoaded', function() {
+      populateSelects();
+      loadSavedPhotos();
+      
+      // Optimisation mobile: dÃ©filement automatique vers le champ actif
+      document.querySelectorAll('input, select, textarea').forEach(el => {
+        el.addEventListener('focus', () => {
+          setTimeout(() => {
+            window.scrollTo({
+              top: el.getBoundingClientRect().top + window.pageYOffset - 100,
+              behavior: 'smooth'
+            });
+          }, 100);
+        });
+      });
+    });
+
+    // Remplir les sÃ©lecteurs
+    function populateSelects() {
+      // Dimensions principales et puit de lumiÃ¨re (0 Ã  200)
+      const dimensionSelects = document.querySelectorAll(`
+        select[id^="dimension"], 
+        #puitLumiere1Dim1, #puitLumiere1Dim2,
+        #puitLumiere2Dim1, #puitLumiere2Dim2
+      `);
+      
+      dimensionSelects.forEach(select => {
+        // Conserver l'option par dÃ©faut
+        const defaultOption = select.options[0];
+        select.innerHTML = '';
+        select.appendChild(defaultOption);
+        
+        // Ajouter les options de 1 Ã  200
+        for (let i = 1; i <= 200; i++) {
+          const option = document.createElement('option');
+          option.value = i;
+          option.textContent = i;
+          select.appendChild(option);
+        }
+      });
+      
+      // Autres sÃ©lecteurs (0 Ã  50)
+      const smallSelects = [
+        'nbFeuilles', 'nbMax', 'nbEvents', 'nbDrains',
+        'trepiedElectrique', 'ff180', 'armorbound180'
+      ];
+      
+      smallSelects.forEach(id => {
+        const select = document.getElementById(id);
+        for (let i = 0; i <= 50; i++) {
+          const option = document.createElement('option');
+          option.value = i;
+          option.textContent = i;
+          select.appendChild(option);
+        }
+      });
+    }
+    
+    // Calcul de la superficie avec dÃ©duction des puits de lumiÃ¨re
+    function calculerSuperficie() {
+      const dim1 = parseFloat(document.getElementById('dimension1').value) || 0;
+      const dim2 = parseFloat(document.getElementById('dimension2').value) || 0;
+      const dim3 = parseFloat(document.getElementById('dimension3').value) || 0;
+      const dim4 = parseFloat(document.getElementById('dimension4').value) || 0;
+      
+      // Calcul des puits de lumiÃ¨re
+      const pl1Dim1 = parseFloat(document.getElementById('puitLumiere1Dim1').value) || 0;
+      const pl1Dim2 = parseFloat(document.getElementById('puitLumiere1Dim2').value) || 0;
+      const pl2Dim1 = parseFloat(document.getElementById('puitLumiere2Dim1').value) || 0;
+      const pl2Dim2 = parseFloat(document.getElementById('puitLumiere2Dim2').value) || 0;
+      
+      const superficieTotale = (dim1 * dim2) + (dim3 * dim4);
+      const superficiePuitsLumiere = (pl1Dim1 * pl1Dim2) + (pl2Dim1 * pl2Dim2);
+      
+      const superficieNet = Math.max(0, superficieTotale - superficiePuitsLumiere);
+      document.getElementById('superficie').textContent = superficieNet;
+    }
+    
+    // RÃ©initialisation
+    function resetForm() {
+      document.getElementById('soumissionForm').reset();
+      document.getElementById('superficie').textContent = '0';
+      projectPhotos = [];
+      photoCounter = 0;
+      updatePhotoGrid();
+      localStorage.removeItem('projectPhotos');
+      showNotification('Formulaire rÃ©initialisÃ© avec succÃ¨s', 'success');
+    }
+    
+    // Notifications
+    function showNotification(message, type) {
+      const notification = document.getElementById('notification');
+      const messageElement = document.getElementById('notificationMessage');
+      const icon = notification.querySelector('i');
+      
+      // Changer l'icÃ´ne selon le type
+      if (type === 'success') {
+        icon.className = 'fas fa-check-circle';
+      } else {
+        icon.className = 'fas fa-exclamation-circle';
+      }
+      
+      messageElement.textContent = message;
+      notification.className = notification ${type} show;
+      
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+    
+    // Fonction pour prendre une photo
+    function takePhoto() {
+      // CrÃ©er un Ã©lÃ©ment input de type file
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.capture = 'camera'; // Pour forcer l'appareil photo sur mobile
+      
+      input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          
+          reader.onload = function(event) {
+            const photoData = {
+              id: 'photo_' + Date.now(),
+              data: event.target.result,
+              date: new Date().toLocaleString(),
+              description: 'Photo du projet'
+            };
+            
+            projectPhotos.push(photoData);
+            updatePhotoGrid();
+            savePhotosToLocalStorage();
+            
+            showNotification('Photo ajoutÃ©e avec succÃ¨s', 'success');
+          };
+          
+          reader.readAsDataURL(file);
+        }
+      };
+      
+      input.click();
+    }
+    
+    // Mettre Ã  jour la grille de photos
+    function updatePhotoGrid() {
+      const photosGrid = document.querySelector('.photos-grid');
+      photosGrid.innerHTML = '';
+      
+      // Ajouter les photos existantes
+      projectPhotos.forEach((photo, index) => {
+        const photoItem = document.createElement('div');
+        photoItem.className = 'photo-item';
+        
+        const img = document.createElement('img');
+        img.src = photo.data;
+        img.alt = photo.description;
+        img.onclick = () => showPhoto(photo.data, photo.description, photo.date);
+        
+        const photoActions = document.createElement('div');
+        photoActions.className = 'photo-actions';
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'photo-btn';
+        deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Supprimer';
+        deleteBtn.onclick = (e) => {
+          e.stopPropagation();
+          deletePhoto(index);
+        };
+        
+        photoActions.appendChild(deleteBtn);
+        photoItem.appendChild(img);
+        photoItem.appendChild(photoActions);
+        photosGrid.appendChild(photoItem);
+      });
+      
+      // Ajouter le bouton pour ajouter une nouvelle photo
+      const addPhotoItem = document.createElement('div');
+      addPhotoItem.className = 'photo-item';
+      
+      const addPhotoPlaceholder = document.createElement('div');
+      addPhotoPlaceholder.className = 'photo-placeholder';
+      addPhotoPlaceholder.onclick = takePhoto;
+      
+      addPhotoPlaceholder.innerHTML = `
+        <i class="fas fa-plus-circle"></i>
+        <span>Ajouter</span>
+      `;
+      
+      addPhotoItem.appendChild(addPhotoPlaceholder);
+      photosGrid.appendChild(addPhotoItem);
+    }
+    
+    // Supprimer une photo
+    function deletePhoto(index) {
+      projectPhotos.splice(index, 1);
+      updatePhotoGrid();
+      savePhotosToLocalStorage();
+      showNotification('Photo supprimÃ©e', 'success');
+    }
+    
+    // Afficher une photo en grand
+    function showPhoto(src, description, date) {
+      const modal = document.getElementById('photoModal');
+      const modalContent = document.getElementById('modalContent');
+      
+      modalContent.innerHTML = `
+        <img src="${src}" alt="${description}">
+        <div class="photo-info">
+          <p>${description}</p>
+          <p><small>${date}</small></p>
+        </div>
+      `;
+      
+      modal.style.display = 'flex';
+    }
+    
+    // Fermer le modal
+    function closeModal() {
+      document.getElementById('photoModal').style.display = 'none';
+    }
+    
+    // Sauvegarder les photos dans le localStorage
+    function savePhotosToLocalStorage() {
+      localStorage.setItem('projectPhotos', JSON.stringify(projectPhotos));
+    }
+    
+    // Charger les photos sauvegardÃ©es
+    function loadSavedPhotos() {
+      const savedPhotos = localStorage.getItem('projectPhotos');
+      if (savedPhotos) {
+        projectPhotos = JSON.parse(savedPhotos);
+        updatePhotoGrid();
+      }
+    }
+    
+    // Enregistrement avec les nouveaux champs
+    function enregistrerSoumission() {
+      const adresse = document.getElementById('adresse').value.trim();
+      if (!adresse) {
+        showNotification('Veuillez saisir une adresse', 'error');
+        return;
+      }
+      
+      const formData = {
+        date: new Date().toLocaleDateString('fr-CA'),
+        client: {
+          nom: document.getElementById('nom').value,
+          adresse: adresse,
+          telephone: document.getElementById('telephone').value,
+          courriel: document.getElementById('courriel').value
+        },
+        toiture: {
+          dimensions: [
+            { valeur: document.getElementById('dimension1').value },
+            { valeur: document.getElementById('dimension2').value },
+            { valeur: document.getElementById('dimension3').value },
+            { valeur: document.getElementById('dimension4').value }
+          ],
+          superficie_totale: document.getElementById('superficie').textContent,
+          plusieurs_epaisseurs: document.getElementById('plusieursEpaisseurs').checked
+        },
+        materiaux: {
+          feuilles: document.getElementById('nbFeuilles').value,
+          max: document.getElementById('nbMax').value,
+          events: document.getElementById('nbEvents').value,
+          drains: document.getElementById('nbDrains').value,
+          trepied_electrique: document.getElementById('trepiedElectrique').value,
+          ff180: document.getElementById('ff180').value,
+          armorbound180: document.getElementById('armorbound180').value,
+          puit_lumiere_1: {
+            dim1: document.getElementById('puitLumiere1Dim1').value,
+            dim2: document.getElementById('puitLumiere1Dim2').value
+          },
+          puit_lumiere_2: {
+            dim1: document.getElementById('puitLumiere2Dim1').value,
+            dim2: document.getElementById('puitLumiere2Dim2').value
+          }
+        },
+        options: {
+          hydro_quebec: document.getElementById('hydroQuebec').checked,
+          grue: document.getElementById('grue').checked,
+          trackfall: document.getElementById('trackfall').checked
+        },
+        notes: document.getElementById('notes').value,
+        photos: projectPhotos // Inclure les photos dans les donnÃ©es
+      };
+      
+      const annee = new Date().getFullYear();
+      const nomFichier = Soumission_${annee}_${adresse.replace(/[^a-z0-9]/gi, '_')}.json;
+      
+      const dataStr = JSON.stringify(formData, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', nomFichier);
+      document.body.appendChild(linkElement);
+      
+      linkElement.click();
+      document.body.removeChild(linkElement);
+      
+      showNotification(Soumission enregistrÃ©e avec succÃ¨s, 'success');
+    }
+  </script><script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js')
+    .then(() => console.log("Service Worker enregistrÃ©"))
+    .catch(error => console.error("Erreur Service Worker :", error));
+}
+</script></body>
+</html>
