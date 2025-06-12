@@ -1,7 +1,7 @@
 {
-  "name": "Soumission Toiture",
-  "short_name": "Toiture",
-  "start_url": "./soumission_toiture_fusion.html",
+  "name": "Toit Pro",
+  "short_name": "ToitPro",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#f0f2f5",
   "theme_color": "#3498db",
