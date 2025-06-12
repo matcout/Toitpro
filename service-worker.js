@@ -2,10 +2,10 @@ self.addEventListener('install', function(e) {
   e.waitUntil(
     caches.open('toiture-cache').then(function(cache) {
       return cache.addAll([
-        './',  // Ajout de la page principale
+        './',
         './index.html',
         './manifest.json',
-        // Ajouter d'autres ressources nécessaires
+        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'
       ]);
     })
   );
