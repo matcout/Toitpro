@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Soumission Toiture</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-
-    /* ... (styles existants) ... */
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<title>Toit Pro</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
+<style>
+    /* ... (garder tous les styles existants) ... */
 
     /* AJOUT: Styles pour la grille de photos et le modal */
     .photos-grid {
@@ -137,77 +138,273 @@
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       }
     }
-
-    /* Ton CSS reste inchangé ici – tu peux le laisser tel quel */
-    /* ... (tu peux coller ici tout le CSS que tu avais dans ton code précédent) ... */
-  </style>
+</style>
+<link href="manifest.json" rel="manifest"/>
 </head>
 <body>
-  <div class="container">
-    <!-- Section principale visible au départ -->
-    <div id="main-page">
-      <h1>Page principale</h1>
-      <button onclick="showForm()">Créer une nouvelle soumission</button>
-    </div>
+<div class="container">
+<header>
+<div class="logo">
+<i class="fas fa-home"></i>
+<h1>Toit Pro</h1>
+</div>
+</header>
+<!-- Page principale - Liste des dossiers -->
+<div id="main-page">
+<div class="search-container">
+<i class="fas fa-search"></i>
+<input id="search-input" placeholder="Rechercher un dossier..." type="text"/>
+</div>
+<div class="folder-container">
+<div class="folder-item" onclick="openYearFolder('2023')">
+<div class="folder-icon">
+<i class="fas fa-folder"></i>
+</div>
+<div class="folder-content">
+<h3>2023</h3>
+<p>12 dossiers</p>
+</div>
+<div class="folder-arrow">
+<i class="fas fa-chevron-right"></i>
+</div>
+</div>
+<div class="folder-item" onclick="openYearFolder('2022')">
+<div class="folder-icon">
+<i class="fas fa-folder"></i>
+</div>
+<div class="folder-content">
+<h3>2022</h3>
+<p>8 dossiers</p>
+</div>
+<div class="folder-arrow">
+<i class="fas fa-chevron-right"></i>
+</div>
+</div>
+<div class="folder-item" onclick="openYearFolder('2021')">
+<div class="folder-icon">
+<i class="fas fa-folder"></i>
+</div>
+<div class="folder-content">
+<h3>2021</h3>
+<p>5 dossiers</p>
+</div>
+<div class="folder-arrow">
+<i class="fas fa-chevron-right"></i>
+</div>
+</div>
+</div>
+<!-- Bouton pour créer une nouvelle soumission -->
+<button class="btn btn-save" onclick="showForm()" style="width: 100%;">
+<i class="fas fa-plus"></i> Nouvelle soumission
+</button>
+</div>
+<!-- Page du formulaire de soumission -->
+<div id="form-page" style="display: none;">
+<button class="btn btn-back" onclick="hideForm()">
+<i class="fas fa-arrow-left"></i> Retour aux dossiers
+</button>
+<form id="soumissionForm">
+<!-- Section Informations client -->
+<div class="form-section">
+<h2 class="section-title">
+<i class="fas fa-user"></i>
+            Informations client
+          </h2>
+<label class="required" for="nom">Nom du client :</label>
+<input id="nom" name="nom" placeholder="Nom complet" required="" type="text"/>
+<label class="required" for="adresse">Adresse des travaux :</label>
+<input id="adresse" name="adresse" placeholder="Adresse complète" required="" type="text"/>
+<div class="grid-2">
+<div>
+<label class="required" for="telephone">Téléphone :</label>
+<input id="telephone" name="telephone" placeholder="(123) 456-7890" required="" type="tel"/>
+</div>
+<div>
+<label class="required" for="courriel">Courriel :</label>
+<input id="courriel" name="courriel" placeholder="email@exemple.com" required="" type="email"/>
+</div>
+</div>
+</div>
+<!-- Section Dimensions -->
+<div class="form-section">
+<h2 class="section-title">
+<i class="fas fa-ruler-combined"></i>
+            Dimensions de la toiture
+          </h2>
+<div class="dimensions-row">
+<select id="dimension1" name="dimension1" onchange="calculerSuperficie()">
+<option value="0">Longueur 1</option>
+</select>
+<span>×</span>
+<select id="dimension2" name="dimension2" onchange="calculerSuperficie()">
+<option value="0">Largeur 1</option>
+</select>
+</div>
+<div class="dimensions-row">
+<select id="dimension3" name="dimension3" onchange="calculerSuperficie()">
+<option value="0">Longueur 2</option>
+</select>
+<span>×</span>
+<select id="dimension4" name="dimension4" onchange="calculerSuperficie()">
+<option value="0">Largeur 2</option>
+</select>
+</div>
+<div class="superficie-container">
+<label>Superficie totale :</label>
+<output id="superficie">0</output>
+</div>
+<div class="form-note">Saisissez les dimensions de chaque section de toiture en pieds</div>
+</div>
+<!-- Section Matériaux -->
+<div class="form-section">
+<h2 class="section-title">
+<i class="fas fa-tools"></i>
+            Matériaux et accessoires
+          </h2>
+<div class="grid-3">
+<div>
+<label for="nbFeuilles">Feuilles de tôles</label>
+<select id="nbFeuilles" name="nbFeuilles"></select>
+</div>
+<div>
+<label for="nbMax">Maximum</label>
+<select id="nbMax" name="nbMax"></select>
+</div>
+<div>
+<label for="nbEvents">Évents</label>
+<select id="nbEvents" name="nbEvents"></select>
+</div>
+<div>
+<label for="nbDrains">Drains</label>
+<select id="nbDrains" name="nbDrains"></select>
+</div>
+<div>
+<label for="trepiedElectrique">Trépied électrique</label>
+<select id="trepiedElectrique" name="trepiedElectrique"></select>
+</div>
+<div>
+<label for="ff180">180FF</label>
+<select id="ff180" name="ff180"></select>
+</div>
+<div>
+<label for="armorbound180">Armorbound 180</label>
+<select id="armorbound180" name="armorbound180"></select>
+</div>
+</div>
+<!-- Section Puit de lumière 1 -->
+<div class="puit-lumiere-container">
+<label>Puit de lumière 1</label>
+<div class="puit-lumiere-row">
+<select id="puitLumiere1Dim1" name="puitLumiere1Dim1" onchange="calculerSuperficie()">
+<option value="0">Longueur</option>
+</select>
+<span>×</span>
+<select id="puitLumiere1Dim2" name="puitLumiere1Dim2" onchange="calculerSuperficie()">
+<option value="0">Largeur</option>
+</select>
+</div>
+</div>
+<!-- Section Puit de lumière 2 -->
+<div class="puit-lumiere-container" style="margin-top: 15px;">
+<label>Puit de lumière 2</label>
+<div class="puit-lumiere-row">
+<select id="puitLumiere2Dim1" name="puitLumiere2Dim1" onchange="calculerSuperficie()">
+<option value="0">Longueur</option>
+</select>
+<span>×</span>
+<select id="puitLumiere2Dim2" name="puitLumiere2Dim2" onchange="calculerSuperficie()">
+<option value="0">Largeur</option>
+</select>
+</div>
+</div>
+<div class="form-note">Les puits de lumière seront déduits de la superficie totale</div>
+</div>
+<!-- Section Photos -->
+<div class="form-section">
+<h2 class="section-title">
+<i class="fas fa-camera"></i>
+            Photos du projet
+          </h2>
+<div class="photos-container">
+<p>Prenez des photos de la toiture pour documenter votre projet</p>
+<div class="photos-grid">
+<!-- Les photos seront ajoutées ici dynamiquement -->
+<div class="photo-item">
+<div class="photo-placeholder" onclick="takePhoto()">
+<i class="fas fa-plus-circle"></i>
+<span>Ajouter</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Section Autres -->
+<div class="form-section">
+<h2 class="section-title">
+<i class="fas fa-cogs"></i>
+            Autres options
+          </h2>
+<div class="checkbox-container">
+<div class="checkbox-item">
+<input id="plusieursEpaisseurs" name="plusieursEpaisseurs" type="checkbox"/>
+<label for="plusieursEpaisseurs">Plusieurs épaisseurs de toiture</label>
+</div>
+<div class="checkbox-item">
+<input id="hydroQuebec" name="hydroQuebec" type="checkbox"/>
+<label for="hydroQuebec">Travaux Hydro Québec requis</label>
+</div>
+<div class="checkbox-item">
+<input id="grue" name="grue" type="checkbox"/>
+<label for="grue">Grue nécessaire</label>
+</div>
+<div class="checkbox-item">
+<input id="trackfall" name="trackfall" type="checkbox"/>
+<label for="trackfall">Trackfall et chute</label>
+</div>
+</div>
+</div>
+<!-- Notes supplémentaires -->
+<div class="form-section">
+<h2 class="section-title">
+<i class="fas fa-sticky-note"></i>
+            Notes supplémentaires
+          </h2>
+<label for="notes">Détails, observations ou instructions spéciales :</label>
+<textarea id="notes" name="notes" placeholder="Décrivez ici toute information supplémentaire importante..."></textarea>
+</div>
+<!-- Boutons -->
+<div class="button-container">
+<button class="btn btn-save" onclick="enregistrerSoumission()" type="button">
+<i class="fas fa-save"></i> Enregistrer la soumission
+</button>
+<button class="btn btn-reset" onclick="resetForm()" type="button">
+<i class="fas fa-redo"></i> Réinitialiser
+</button>
+</div>
+</form>
+</div>
+<!-- Page des dossiers par année -->
+<div id="year-page" style="display: none;">
+<button class="btn btn-back" onclick="backToMain()">
+<i class="fas fa-arrow-left"></i> Retour
+</button>
+<div class="folder-container" id="year-folders">
+<!-- Les sous-dossiers seront générés dynamiquement ici -->
+</div>
+</div>
+</div>
+<div class="notification" id="notification">
+<i class="fas fa-check-circle"></i>
+<span id="notificationMessage"></span>
+</div>
 
-    <!-- Formulaire de soumission -->
-    <div id="form-page" style="display: none;">
-      <h2>Formulaire</h2>
-      <form id="soumissionForm">
-        <label for="nom">Nom du client:</label>
-        <input type="text" id="nom" />
+<!-- AJOUT: Modal pour afficher les photos -->
+<div id="photoModal">
+  <button class="close-modal" onclick="closeModal()">&times;</button>
+  <div id="modalContent"></div>
+</div>
 
-        <label for="adresse">Adresse:</label>
-        <input type="text" id="adresse" />
-
-        <label for="telephone">Téléphone:</label>
-        <input type="tel" id="telephone" />
-
-        <label for="courriel">Courriel:</label>
-        <input type="email" id="courriel" />
-
-        <!-- Exemples de sélecteurs de dimensions -->
-        <label for="dimension1">Dimension 1:</label>
-        <select id="dimension1"><option>0</option></select>
-
-        <label for="dimension2">Dimension 2:</label>
-        <select id="dimension2"><option>0</option></select>
-
-        <label for="superficie">Superficie:</label>
-        <span id="superficie">0</span>
-
-        <button type="button" onclick="calculerSuperficie()">Calculer</button>
-        <button type="button" onclick="enregistrerSoumission()">Enregistrer</button>
-        <button type="button" onclick="resetForm()">Réinitialiser</button>
-        <button type="button" onclick="hideForm()">Retour</button>
-      </form>
-
-      <!-- Zone de photos -->
-      <div class="photos-grid"></div>
-    </div>
-
-    <!-- Dossiers par année -->
-    <div id="year-page" style="display: none;">
-      <h2>Dossiers par année</h2>
-      <div id="year-folders"></div>
-      <button onclick="backToMain()">Retour</button>
-    </div>
-  </div>
-
-  <!-- Modal pour afficher les photos -->
-  <div id="photoModal">
-    <button class="close-modal" onclick="closeModal()">&times;</button>
-    <div id="modalContent"></div>
-  </div>
-
-  <!-- Notification -->
-  <div id="notification" class="notification">
-    <i class="fas"></i> <span id="notificationMessage"></span>
-  </div>
-
-  <!-- Ton JavaScript intégré -->
-  <script>
-  
+<script>
     // Base de données unique
     let soumissionsDB = JSON.parse(localStorage.getItem('soumissionsDB')) || [];
     let projectPhotos = JSON.parse(localStorage.getItem('projectPhotos')) || [];
@@ -264,7 +461,7 @@
       document.getElementById('year-page').style.display = 'block';
       
       const yearFolders = document.getElementById('year-folders');
-      yearFolders.innerHTML = 
+      yearFolders.innerHTML = `
         <div class="folder-item" onclick="openSubFolder('${year}', 'Soumission')">
           <div class="folder-icon" style="background-color: var(--primary);">
             <i class="fas fa-file-signature"></i>
@@ -277,12 +474,50 @@
             <i class="fas fa-chevron-right"></i>
           </div>
         </div>
-        <!-- ... (autres dossiers) ... -->
-      ;
+        
+        <div class="folder-item" onclick="openSubFolder('${year}', 'Contrat')">
+          <div class="folder-icon" style="background-color: var(--success);">
+            <i class="fas fa-file-contract"></i>
+          </div>
+          <div class="folder-content">
+            <h3>Contrat</h3>
+            <p>Contrats signés</p>
+          </div>
+          <div class="folder-arrow">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
+        
+        <div class="folder-item" onclick="openSubFolder('${year}', 'Reparage')">
+          <div class="folder-icon" style="background-color: var(--warning);">
+            <i class="fas fa-tools"></i>
+          </div>
+          <div class="folder-content">
+            <h3>Réparage</h3>
+            <p>Documents de réparation</p>
+          </div>
+          <div class="folder-arrow">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
+        
+        <div class="folder-item" onclick="openSubFolder('${year}', 'Inspection')">
+          <div class="folder-icon" style="background-color: var(--danger);">
+            <i class="fas fa-search"></i>
+          </div>
+          <div class="folder-content">
+            <h3>Inspection</h3>
+            <p>Rapports d'inspection</p>
+          </div>
+          <div class="folder-arrow">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </div>
+      `;
     }
     
     function openSubFolder(year, type) {
-      showNotification(Ouverture des ${type} pour ${year}, 'success');
+      showNotification(`Ouverture des ${type} pour ${year}`, 'success');
     }
     
     function backToMain() {
@@ -294,11 +529,11 @@
     // Remplir les sélecteurs
     function populateSelects() {
       // Dimensions (1-200)
-      const dimensionSelects = document.querySelectorAll(
+      const dimensionSelects = document.querySelectorAll(`
         select[id^="dimension"], 
         #puitLumiere1Dim1, #puitLumiere1Dim2,
         #puitLumiere2Dim1, #puitLumiere2Dim2
-      );
+      `);
       
       dimensionSelects.forEach(select => {
         select.innerHTML = '<option value="0">' + select.options[0].text + '</option>';
@@ -374,14 +609,14 @@
       projectPhotos.forEach((photo, index) => {
         const photoItem = document.createElement('div');
         photoItem.className = 'photo-item';
-        photoItem.innerHTML = 
+        photoItem.innerHTML = `
           <img src="${photo.data}" alt="${photo.description}">
           <div class="photo-actions">
             <button class="photo-btn" onclick="deletePhoto(${index})">
               <i class="fas fa-trash"></i> Supprimer
             </button>
           </div>
-        ;
+        `;
         photoItem.querySelector('img').onclick = () => 
           showPhoto(photo.data, photo.description, photo.date);
         photosGrid.appendChild(photoItem);
@@ -390,12 +625,12 @@
       // Bouton d'ajout
       const addBtn = document.createElement('div');
       addBtn.className = 'photo-item';
-      addBtn.innerHTML = 
+      addBtn.innerHTML = `
         <div class="photo-placeholder" onclick="takePhoto()">
           <i class="fas fa-plus-circle"></i>
           <span>Ajouter</span>
         </div>
-      ;
+      `;
       photosGrid.appendChild(addBtn);
     }
     
@@ -408,13 +643,13 @@
     
     function showPhoto(src, description, date) {
       const modalContent = document.getElementById('modalContent');
-      modalContent.innerHTML = 
+      modalContent.innerHTML = `
         <img src="${src}" alt="${description}">
         <div class="photo-info">
           <p>${description}</p>
           <p><small>${date}</small></p>
         </div>
-      ;
+      `;
       document.getElementById('photoModal').style.display = 'flex';
     }
     
@@ -455,7 +690,7 @@
         : 'fas fa-exclamation-circle';
       
       messageElement.textContent = message;
-      notification.className = notification ${type} show;
+      notification.className = `notification ${type} show`;
       
       setTimeout(() => notification.classList.remove('show'), 3000);
     }
@@ -483,7 +718,25 @@
         },
         materiaux: {
           feuilles: document.getElementById('nbFeuilles').value,
-          // ... autres matériaux
+          max: document.getElementById('nbMax').value,
+          events: document.getElementById('nbEvents').value,
+          drains: document.getElementById('nbDrains').value,
+          trepied_electrique: document.getElementById('trepiedElectrique').value,
+          ff180: document.getElementById('ff180').value,
+          armorbound180: document.getElementById('armorbound180').value,
+          puit_lumiere_1: {
+            dim1: document.getElementById('puitLumiere1Dim1').value,
+            dim2: document.getElementById('puitLumiere1Dim2').value
+          },
+          puit_lumiere_2: {
+            dim1: document.getElementById('puitLumiere2Dim1').value,
+            dim2: document.getElementById('puitLumiere2Dim2').value
+          }
+        },
+        options: {
+          hydro_quebec: document.getElementById('hydroQuebec').checked,
+          grue: document.getElementById('grue').checked,
+          trackfall: document.getElementById('trackfall').checked
         },
         photos: projectPhotos,
         notes: document.getElementById('notes').value
@@ -496,7 +749,7 @@
       // Téléchargement JSON
       const dataStr = JSON.stringify(soumission, null, 2);
       const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      const exportName = Soumission_${soumission.date.substring(0,10)}_${adresse.replace(/\s+/g, '_')}.json;
+      const exportName = `Soumission_${soumission.date.substring(0,10)}_${adresse.replace(/\s+/g, '_')}.json`;
       
       const link = document.createElement('a');
       link.href = dataUri;
@@ -505,7 +758,7 @@
       link.click();
       document.body.removeChild(link);
       
-      showNotification(Soumission enregistrée pour ${soumission.client.nom}, 'success');
+      showNotification(`Soumission enregistrée pour ${soumission.client.nom}`, 'success');
       resetForm();
       hideForm();
     }
@@ -516,11 +769,6 @@
         .then(() => console.log("Service Worker enregistré"))
         .catch(error => console.error("Erreur Service Worker :", error));
     }
-
-    // Tu peux ici coller TOUT le JavaScript que tu avais, tel quel
-    // (je ne le recopie pas ici pour ne pas tout réécrire une deuxième fois)
-
-    // Important : assure-toi que tout reste exactement comme dans ton fichier actuel
-  </script>
+</script>
 </body>
 </html>
