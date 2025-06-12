@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<!-- ... (contenu existant inchangé) ... -->
-  <style>
-    /* ... (styles existants inchangés) ... */
+<!-- ... (le reste du head reste inchangé) ... -->
+<style>
+    /* ... (styles existants) ... */
 
-    /* Nouveaux styles pour la grille de photos */
+    /* AJOUT: Styles pour la grille de photos et le modal */
     .photos-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
@@ -133,51 +133,22 @@
         grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
       }
     }
-  </style>
+</style>
 </head>
 <body>
-  <div class="container">
-    <!-- ... (contenu existant inchangé) ... -->
+<div class="container">
+<!-- ... (le reste du body reste inchangé jusqu'à la fin) ... -->
 
-    <!-- Page du formulaire de soumission -->
-    <div id="form-page" style="display: none;">
-      <!-- ... (contenu existant inchangé) ... -->
+<!-- AJOUT: Modal pour afficher les photos -->
+<div id="photoModal">
+  <button class="close-modal" onclick="closeModal()">&times;</button>
+  <div id="modalContent"></div>
+</div>
 
-      <!-- Section Photos -->
-      <div class="form-section">
-        <h2 class="section-title">
-          <i class="fas fa-camera"></i>
-          Photos du projet
-        </h2>
-        <div class="photos-container">
-          <p>Prenez des photos de la toiture pour documenter votre projet</p>
-          <div class="photos-grid">
-            <!-- Les photos seront ajoutées ici dynamiquement -->
-            <div class="photo-item">
-              <div class="photo-placeholder" onclick="takePhoto()">
-                <i class="fas fa-plus-circle"></i>
-                <span>Ajouter</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- ... (contenu existant inchangé) ... -->
-    </div>
-  </div>
-
-  <!-- Modal pour afficher les photos -->
-  <div id="photoModal">
-    <button class="close-modal" onclick="closeModal()">&times;</button>
-    <div id="modalContent"></div>
-  </div>
-
-  <script>
-    // Base de données simulée
+<script>
+    // Base de données unique
     let soumissionsDB = JSON.parse(localStorage.getItem('soumissionsDB')) || [];
-    let projectPhotos = [];
-    let photoCounter = 0;
+    let projectPhotos = JSON.parse(localStorage.getItem('projectPhotos')) || [];
 
     // Initialisation
     document.addEventListener('DOMContentLoaded', function() {
@@ -185,7 +156,7 @@
       setupSearch();
       loadSavedPhotos();
       
-      // Optimisation mobile: défilement automatique vers le champ actif
+      // Optimisation mobile: défilement automatique
       document.querySelectorAll('input, select, textarea').forEach(el => {
         el.addEventListener('focus', () => {
           setTimeout(() => {
@@ -207,30 +178,24 @@
         
         folders.forEach(folder => {
           const title = folder.querySelector('h3').textContent.toLowerCase();
-          if (title.includes(searchTerm)) {
-            folder.style.display = 'flex';
-          } else {
-            folder.style.display = 'none';
-          }
+          folder.style.display = title.includes(searchTerm) ? 'flex' : 'none';
         });
       });
     }
     
-    // Afficher le formulaire
+    // Navigation entre pages
     function showForm() {
       document.getElementById('main-page').style.display = 'none';
       document.getElementById('form-page').style.display = 'block';
       document.getElementById('year-page').style.display = 'none';
     }
     
-    // Masquer le formulaire
     function hideForm() {
       document.getElementById('main-page').style.display = 'block';
       document.getElementById('form-page').style.display = 'none';
       document.getElementById('year-page').style.display = 'none';
     }
     
-    // Ouvrir un dossier année
     function openYearFolder(year) {
       document.getElementById('main-page').style.display = 'none';
       document.getElementById('form-page').style.display = 'none';
@@ -250,55 +215,14 @@
             <i class="fas fa-chevron-right"></i>
           </div>
         </div>
-        
-        <div class="folder-item" onclick="openSubFolder('${year}', 'Contrat')">
-          <div class="folder-icon" style="background-color: var(--success);">
-            <i class="fas fa-file-contract"></i>
-          </div>
-          <div class="folder-content">
-            <h3>Contrat</h3>
-            <p>Contrats signés</p>
-          </div>
-          <div class="folder-arrow">
-            <i class="fas fa-chevron-right"></i>
-          </div>
-        </div>
-        
-        <div class="folder-item" onclick="openSubFolder('${year}', 'Reparage')">
-          <div class="folder-icon" style="background-color: var(--warning);">
-            <i class="fas fa-tools"></i>
-          </div>
-          <div class="folder-content">
-            <h3>Réparage</h3>
-            <p>Documents de réparation</p>
-          </div>
-          <div class="folder-arrow">
-            <i class="fas fa-chevron-right"></i>
-          </div>
-        </div>
-        
-        <div class="folder-item" onclick="openSubFolder('${year}', 'Inspection')">
-          <div class="folder-icon" style="background-color: var(--danger);">
-            <i class="fas fa-search"></i>
-          </div>
-          <div class="folder-content">
-            <h3>Inspection</h3>
-            <p>Rapports d'inspection</p>
-          </div>
-          <div class="folder-arrow">
-            <i class="fas fa-chevron-right"></i>
-          </div>
-        </div>
+        <!-- ... (autres dossiers) ... -->
       `;
     }
     
-    // Ouvrir un sous-dossier
     function openSubFolder(year, type) {
-      // Ici vous pouvez implémenter la logique pour afficher les documents spécifiques
       showNotification(`Ouverture des ${type} pour ${year}`, 'success');
     }
     
-    // Retour à la page principale
     function backToMain() {
       document.getElementById('main-page').style.display = 'block';
       document.getElementById('form-page').style.display = 'none';
@@ -307,7 +231,7 @@
     
     // Remplir les sélecteurs
     function populateSelects() {
-      // Dimensions principales et puit de lumière (0 à 200)
+      // Dimensions (1-200)
       const dimensionSelects = document.querySelectorAll(`
         select[id^="dimension"], 
         #puitLumiere1Dim1, #puitLumiere1Dim2,
@@ -315,55 +239,137 @@
       `);
       
       dimensionSelects.forEach(select => {
-        // Conserver l'option par défaut
-        const defaultOption = select.options[0];
-        select.innerHTML = '';
-        select.appendChild(defaultOption);
-        
-        // Ajouter les options de 1 à 200
+        select.innerHTML = '<option value="0">' + select.options[0].text + '</option>';
         for (let i = 1; i <= 200; i++) {
-          const option = document.createElement('option');
-          option.value = i;
-          option.textContent = i;
-          select.appendChild(option);
+          select.appendChild(new Option(i, i));
         }
       });
       
-      // Autres sélecteurs (0 à 50)
-      const smallSelects = [
-        'nbFeuilles', 'nbMax', 'nbEvents', 'nbDrains',
-        'trepiedElectrique', 'ff180', 'armorbound180'
-      ];
-      
-      smallSelects.forEach(id => {
-        const select = document.getElementById(id);
-        for (let i = 0; i <= 50; i++) {
-          const option = document.createElement('option');
-          option.value = i;
-          option.textContent = i;
-          select.appendChild(option);
-        }
-      });
+      // Autres sélecteurs (0-50)
+      ['nbFeuilles', 'nbMax', 'nbEvents', 'nbDrains', 'trepiedElectrique', 'ff180', 'armorbound180']
+        .forEach(id => {
+          const select = document.getElementById(id);
+          for (let i = 0; i <= 50; i++) {
+            select.appendChild(new Option(i, i));
+          }
+        });
     }
     
-    // Calcul de la superficie avec déduction des puits de lumière
+    // Calcul de superficie
     function calculerSuperficie() {
       const dim1 = parseFloat(document.getElementById('dimension1').value) || 0;
       const dim2 = parseFloat(document.getElementById('dimension2').value) || 0;
       const dim3 = parseFloat(document.getElementById('dimension3').value) || 0;
       const dim4 = parseFloat(document.getElementById('dimension4').value) || 0;
       
-      // Calcul des puits de lumière
+      // Puits de lumière
       const pl1Dim1 = parseFloat(document.getElementById('puitLumiere1Dim1').value) || 0;
       const pl1Dim2 = parseFloat(document.getElementById('puitLumiere1Dim2').value) || 0;
       const pl2Dim1 = parseFloat(document.getElementById('puitLumiere2Dim1').value) || 0;
       const pl2Dim2 = parseFloat(document.getElementById('puitLumiere2Dim2').value) || 0;
       
       const superficieTotale = (dim1 * dim2) + (dim3 * dim4);
-      const superficiePuitsLumiere = (pl1Dim1 * pl1Dim2) + (pl2Dim1 * pl2Dim2);
+      const superficiePuits = (pl1Dim1 * pl1Dim2) + (pl2Dim1 * pl2Dim2);
+      const superficieNet = Math.max(0, superficieTotale - superficiePuits);
       
-      const superficieNet = Math.max(0, superficieTotale - superficiePuitsLumiere);
       document.getElementById('superficie').textContent = superficieNet;
+    }
+    
+    // Gestion des photos
+    function takePhoto() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.capture = 'camera';
+      
+      input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = event => {
+          projectPhotos.push({
+            id: 'photo_' + Date.now(),
+            data: event.target.result,
+            date: new Date().toLocaleString(),
+            description: 'Photo du projet'
+          });
+          
+          updatePhotoGrid();
+          savePhotosToLocalStorage();
+          showNotification('Photo ajoutée avec succès', 'success');
+        };
+        reader.readAsDataURL(file);
+      };
+      
+      input.click();
+    }
+    
+    function updatePhotoGrid() {
+      const photosGrid = document.querySelector('.photos-grid');
+      photosGrid.innerHTML = '';
+      
+      projectPhotos.forEach((photo, index) => {
+        const photoItem = document.createElement('div');
+        photoItem.className = 'photo-item';
+        photoItem.innerHTML = `
+          <img src="${photo.data}" alt="${photo.description}">
+          <div class="photo-actions">
+            <button class="photo-btn" onclick="deletePhoto(${index})">
+              <i class="fas fa-trash"></i> Supprimer
+            </button>
+          </div>
+        `;
+        photoItem.querySelector('img').onclick = () => 
+          showPhoto(photo.data, photo.description, photo.date);
+        photosGrid.appendChild(photoItem);
+      });
+      
+      // Bouton d'ajout
+      const addBtn = document.createElement('div');
+      addBtn.className = 'photo-item';
+      addBtn.innerHTML = `
+        <div class="photo-placeholder" onclick="takePhoto()">
+          <i class="fas fa-plus-circle"></i>
+          <span>Ajouter</span>
+        </div>
+      `;
+      photosGrid.appendChild(addBtn);
+    }
+    
+    function deletePhoto(index) {
+      projectPhotos.splice(index, 1);
+      updatePhotoGrid();
+      savePhotosToLocalStorage();
+      showNotification('Photo supprimée', 'success');
+    }
+    
+    function showPhoto(src, description, date) {
+      const modalContent = document.getElementById('modalContent');
+      modalContent.innerHTML = `
+        <img src="${src}" alt="${description}">
+        <div class="photo-info">
+          <p>${description}</p>
+          <p><small>${date}</small></p>
+        </div>
+      `;
+      document.getElementById('photoModal').style.display = 'flex';
+    }
+    
+    function closeModal() {
+      document.getElementById('photoModal').style.display = 'none';
+    }
+    
+    function savePhotosToLocalStorage() {
+      localStorage.setItem('projectPhotos', JSON.stringify(projectPhotos));
+    }
+    
+    function loadSavedPhotos() {
+      const saved = localStorage.getItem('projectPhotos');
+      if (saved) {
+        projectPhotos = JSON.parse(saved);
+        updatePhotoGrid();
+      }
     }
     
     // Réinitialisation
@@ -371,10 +377,9 @@
       document.getElementById('soumissionForm').reset();
       document.getElementById('superficie').textContent = '0';
       projectPhotos = [];
-      photoCounter = 0;
       updatePhotoGrid();
       localStorage.removeItem('projectPhotos');
-      showNotification('Formulaire réinitialisé avec succès', 'success');
+      showNotification('Formulaire réinitialisé', 'success');
     }
     
     // Notifications
@@ -383,149 +388,17 @@
       const messageElement = document.getElementById('notificationMessage');
       const icon = notification.querySelector('i');
       
-      // Changer l'icône selon le type
-      if (type === 'success') {
-        icon.className = 'fas fa-check-circle';
-      } else {
-        icon.className = 'fas fa-exclamation-circle';
-      }
+      icon.className = type === 'success' 
+        ? 'fas fa-check-circle' 
+        : 'fas fa-exclamation-circle';
       
       messageElement.textContent = message;
       notification.className = `notification ${type} show`;
       
-      setTimeout(() => {
-        notification.classList.remove('show');
-      }, 3000);
+      setTimeout(() => notification.classList.remove('show'), 3000);
     }
     
-    // Fonction pour prendre une photo
-    function takePhoto() {
-      // Créer un élément input de type file
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-      input.capture = 'camera'; // Pour forcer l'appareil photo sur mobile
-      
-      input.onchange = function(e) {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          
-          reader.onload = function(event) {
-            const photoData = {
-              id: 'photo_' + Date.now(),
-              data: event.target.result,
-              date: new Date().toLocaleString(),
-              description: 'Photo du projet'
-            };
-            
-            projectPhotos.push(photoData);
-            updatePhotoGrid();
-            savePhotosToLocalStorage();
-            
-            showNotification('Photo ajoutée avec succès', 'success');
-          };
-          
-          reader.readAsDataURL(file);
-        }
-      };
-      
-      input.click();
-    }
-    
-    // Mettre à jour la grille de photos
-    function updatePhotoGrid() {
-      const photosGrid = document.querySelector('.photos-grid');
-      photosGrid.innerHTML = '';
-      
-      // Ajouter les photos existantes
-      projectPhotos.forEach((photo, index) => {
-        const photoItem = document.createElement('div');
-        photoItem.className = 'photo-item';
-        
-        const img = document.createElement('img');
-        img.src = photo.data;
-        img.alt = photo.description;
-        img.onclick = () => showPhoto(photo.data, photo.description, photo.date);
-        
-        const photoActions = document.createElement('div');
-        photoActions.className = 'photo-actions';
-        
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'photo-btn';
-        deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Supprimer';
-        deleteBtn.onclick = (e) => {
-          e.stopPropagation();
-          deletePhoto(index);
-        };
-        
-        photoActions.appendChild(deleteBtn);
-        photoItem.appendChild(img);
-        photoItem.appendChild(photoActions);
-        photosGrid.appendChild(photoItem);
-      });
-      
-      // Ajouter le bouton pour ajouter une nouvelle photo
-      const addPhotoItem = document.createElement('div');
-      addPhotoItem.className = 'photo-item';
-      
-      const addPhotoPlaceholder = document.createElement('div');
-      addPhotoPlaceholder.className = 'photo-placeholder';
-      addPhotoPlaceholder.onclick = takePhoto;
-      
-      addPhotoPlaceholder.innerHTML = `
-        <i class="fas fa-plus-circle"></i>
-        <span>Ajouter</span>
-      `;
-      
-      addPhotoItem.appendChild(addPhotoPlaceholder);
-      photosGrid.appendChild(addPhotoItem);
-    }
-    
-    // Supprimer une photo
-    function deletePhoto(index) {
-      projectPhotos.splice(index, 1);
-      updatePhotoGrid();
-      savePhotosToLocalStorage();
-      showNotification('Photo supprimée', 'success');
-    }
-    
-    // Afficher une photo en grand
-    function showPhoto(src, description, date) {
-      const modal = document.getElementById('photoModal');
-      const modalContent = document.getElementById('modalContent');
-      
-      modalContent.innerHTML = `
-        <img src="${src}" alt="${description}">
-        <div class="photo-info">
-          <p>${description}</p>
-          <p><small>${date}</small></p>
-        </div>
-      `;
-      
-      modal.style.display = 'flex';
-    }
-    
-    // Fermer le modal
-    function closeModal() {
-      document.getElementById('photoModal').style.display = 'none';
-    }
-    
-    // Sauvegarder les photos dans le localStorage
-    function savePhotosToLocalStorage() {
-      localStorage.setItem('projectPhotos', JSON.stringify(projectPhotos));
-    }
-    
-    // Charger les photos sauvegardées
-    function loadSavedPhotos() {
-      const savedPhotos = localStorage.getItem('projectPhotos');
-      if (savedPhotos) {
-        projectPhotos = JSON.parse(savedPhotos);
-        updatePhotoGrid();
-      }
-    }
-    
-    // Enregistrement avec les nouveaux champs
+    // Enregistrement
     function enregistrerSoumission() {
       const adresse = document.getElementById('adresse').value.trim();
       if (!adresse) {
@@ -535,9 +408,7 @@
       
       const soumission = {
         id: 'soum_' + Date.now(),
-        date: new Date().toLocaleDateString('fr-CA'),
-        annee: new Date().getFullYear(),
-        type: 'Soumission',
+        date: new Date().toISOString(),
         client: {
           nom: document.getElementById('nom').value,
           adresse: adresse,
@@ -545,49 +416,44 @@
           courriel: document.getElementById('courriel').value
         },
         toiture: {
-          dimensions: [
-            { valeur: document.getElementById('dimension1').value },
-            { valeur: document.getElementById('dimension2').value },
-            { valeur: document.getElementById('dimension3').value },
-            { valeur: document.getElementById('dimension4').value }
-          ],
-          superficie_totale: document.getElementById('superficie').textContent,
-          plusieurs_epaisseurs: document.getElementById('plusieursEpaisseurs').checked
+          superficie: document.getElementById('superficie').textContent,
+          epaisseursMultiples: document.getElementById('plusieursEpaisseurs').checked
         },
         materiaux: {
           feuilles: document.getElementById('nbFeuilles').value,
-          max: document.getElementById('nbMax').value,
-          events: document.getElementById('nbEvents').value,
-          drains: document.getElementById('nbDrains').value,
-          trepied_electrique: document.getElementById('trepiedElectrique').value,
-          ff180: document.getElementById('ff180').value,
-          armorbound180: document.getElementById('armorbound180').value,
-          puit_lumiere_1: {
-            dim1: document.getElementById('puitLumiere1Dim1').value,
-            dim2: document.getElementById('puitLumiere1Dim2').value
-          },
-          puit_lumiere_2: {
-            dim1: document.getElementById('puitLumiere2Dim1').value,
-            dim2: document.getElementById('puitLumiere2Dim2').value
-          }
+          // ... autres matériaux
         },
-        options: {
-          hydro_quebec: document.getElementById('hydroQuebec').checked,
-          grue: document.getElementById('grue').checked,
-          trackfall: document.getElementById('trackfall').checked
-        },
-        notes: document.getElementById('notes').value,
-        photos: projectPhotos // Inclure les photos dans les données
+        photos: projectPhotos,
+        notes: document.getElementById('notes').value
       };
       
-      // Sauvegarder dans la base de données
+      // Sauvegarde
       soumissionsDB.push(soumission);
       localStorage.setItem('soumissionsDB', JSON.stringify(soumissionsDB));
+      
+      // Téléchargement JSON
+      const dataStr = JSON.stringify(soumission, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      const exportName = `Soumission_${soumission.date.substring(0,10)}_${adresse.replace(/\s+/g, '_')}.json`;
+      
+      const link = document.createElement('a');
+      link.href = dataUri;
+      link.download = exportName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
       
       showNotification(`Soumission enregistrée pour ${soumission.client.nom}`, 'success');
       resetForm();
       hideForm();
     }
-  </script>
+    
+    // Service Worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log("Service Worker enregistré"))
+        .catch(error => console.error("Erreur Service Worker :", error));
+    }
+</script>
 </body>
 </html>
