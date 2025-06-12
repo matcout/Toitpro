@@ -1,21 +1,20 @@
-{
-  "name": "Soumission Toiture",
-  "short_name": "Toiture",
-  "start_url": "./soumission_toiture_fusion.html",
-  "display": "standalone",
-  "background_color": "#f0f2f5",
-  "theme_color": "#3498db",
-  "orientation": "portrait",
-  "icons": [
-    {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
-}
+self.addEventListener('install', function(e) {
+  e.waitUntil(
+    caches.open('toiture-cache').then(function(cache) {
+      return cache.addAll([
+        './',  // Ajout de la page principale
+        './index.html',
+        './manifest.json',
+        // Ajouter d'autres ressources nécessaires
+      ]);
+    })
+  );
+});
+
+self.addEventListener('fetch', function(e) {
+  e.respondWith(
+    caches.match(e.request).then(function(response) {
+      return response || fetch(e.request);
+    })
+  );
+});
