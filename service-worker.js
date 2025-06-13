@@ -1,11 +1,11 @@
 self.addEventListener('install', function(e) {
   e.waitUntil(
-    caches.open('toiture-cache').then(function(cache) {
+    caches.open('toitpro-cache').then(function(cache) {
       return cache.addAll([
         './',
         './index.html',
         './manifest.json',
-        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css'
+        'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
       ]);
     })
   );
