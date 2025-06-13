@@ -1,1694 +1,450 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8"/>
-<meta name="description" content="Application professionnelle de gestion de soumissions pour les toitures">
-<meta name="author" content="Toit Pro Solutions">
-<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
-<meta content="yes" name="apple-mobile-web-app-capable"/>
-<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<title>Toit Pro</title>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"/>
-<style>
-    :root {
-      --primary: #3498db;
-      --secondary: #2c3e50;
-      --light: #f8f9fa;
-      --success: #27ae60;
-      --warning: #f39c12;
-      --danger: #e74c3c;
-      --border: #dfe6e9;
-      --text: #333;
-      --bg-section: #f5f7fa;
-    }
-    
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      -webkit-tap-highlight-color: transparent;
-    }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f0f2f5;
-      color: var(--text);
-      line-height: 1.6;
-      padding: 0;
-      margin: 0;
-      -webkit-text-size-adjust: 100%;
-      padding-bottom: env(safe-area-inset-bottom);
-    }
-    
-    .container {
-      max-width: 100%;
-      padding: 15px;
-      padding-bottom: calc(15px + env(safe-area-inset-bottom));
-    }
-    
-    header {
-      background: linear-gradient(135deg, var(--secondary), #1a2530);
-      padding: 20px 15px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      color: white;
-      padding-top: max(20px, env(safe-area-inset-top));
-    }
-    
-    .logo {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    
-    .logo h1 {
-      font-size: 1.8rem;
-      font-weight: 600;
-    }
-    
-    .logo i {
-      font-size: 2rem;
-    }
-    
-    .search-container {
-      margin: 15px 0;
-      position: relative;
-    }
-    
-    .search-container input {
-      width: 100%;
-      padding: 12px 15px 12px 40px;
-      border: 1px solid var(--border);
-      border-radius: 25px;
-      font-size: 1rem;
-      background-color: white;
-    }
-    
-    .search-container i {
-      position: absolute;
-      left: 15px;
-      top: 50%;
-      transform: translateY(-50%);
-      color: var(--secondary);
-    }
-    
-    .folder-container {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-      padding: 20px;
-      margin-bottom: 20px;
-    }
-    
-    .folder-item {
-      display: flex;
-      align-items: center;
-      padding: 15px 0;
-      border-bottom: 1px solid var(--border);
-      cursor: pointer;
-      transition: background-color 0.2s;
-      position: relative;
-    }
-    
-    .folder-item:hover {
-      background-color: #f8f9fa;
-    }
-    
-    .folder-item:last-child {
-      border-bottom: none;
-    }
-    
-    .folder-icon {
-      width: 40px;
-      height: 40px;
-      background-color: var(--primary);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      margin-right: 15px;
-      flex-shrink: 0;
-    }
-    
-    .folder-content {
-      flex-grow: 1;
-    }
-    
-    .folder-content h3 {
-      font-size: 1.1rem;
-      margin-bottom: 5px;
-    }
-    
-    .folder-content p {
-      color: #7f8c8d;
-      font-size: 0.9rem;
-    }
-    
-    .folder-arrow {
-      color: var(--secondary);
-    }
-    
-    .folder-actions {
-      margin-left: 10px;
-      display: flex;
-      gap: 8px;
-    }
-    
-    .folder-action-btn {
-      background: transparent;
-      border: none;
-      color: #7f8c8d;
-      cursor: pointer;
-      font-size: 1rem;
-      padding: 5px;
-      border-radius: 50%;
-      width: 30px;
-      height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .folder-action-btn:hover {
-      background: #f1f2f6;
-      color: var(--danger);
-    }
-    
-    .notification {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 16px 30px;
-      border-radius: 8px;
-      color: white;
-      font-weight: 500;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      z-index: 1000;
-      opacity: 0;
-      transition: opacity 0.3s, bottom 0.3s;
-      max-width: 90%;
-      text-align: center;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .notification.show {
-      opacity: 1;
-      bottom: max(40px, env(safe-area-inset-bottom) + 10px);
-    }
-    
-    .notification.success {
-      background: var(--success);
-    }
-    
-    .notification.error {
-      background: var(--danger);
-    }
-    
-    .notification i {
-      font-size: 1.4rem;
-    }
-    
-    /* Styles pour le formulaire de soumission */
-    .form-section {
-      margin-bottom: 25px;
-      padding: 20px;
-      border-radius: 8px;
-      background-color: var(--bg-section);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    }
-    
-    .section-title {
-      font-size: 1.25rem;
-      color: var(--secondary);
-      margin-bottom: 20px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid var(--primary);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .section-title i {
-      font-size: 1.4rem;
-    }
-    
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-      color: var(--secondary);
-      font-size: 0.95rem;
-    }
-    
-    .required::after {
-      content: " *";
-      color: var(--danger);
-    }
-    
-    input[type="text"],
-    input[type="tel"],
-    input[type="email"],
-    select,
-    textarea {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 15px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 1rem;
-      background-color: white;
-      -webkit-appearance: none;
-      appearance: none;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--primary);
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-    }
-    
-    textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-    
-    select {
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%232c3e50' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat;
-      background-position: right 12px center;
-      background-size: 16px;
-    }
-    
-    .dimensions-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 15px;
-    }
-    
-    .dimensions-row select {
-      flex: 1;
-    }
-    
-    .dimensions-row span {
-      font-weight: bold;
-      color: var(--primary);
-      font-size: 1.2rem;
-      width: 24px;
-      text-align: center;
-    }
-    
-    output {
-      display: block;
-      padding: 14px;
-      background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-      border-radius: 8px;
-      margin-bottom: 15px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      text-align: center;
-      color: var(--secondary);
-      border: 1px solid var(--border);
-    }
-    
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 15px;
-      margin-bottom: 15px;
-    }
-    
-    .grid-3 {
-      display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
-      gap: 15px;
-      margin-bottom: 15px;
-    }
-    
-    .button-container {
-      display: flex;
-      gap: 15px;
-      margin-top: 25px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    
-    .btn {
-      padding: 15px 25px;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      text-align: center;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: all 0.3s;
-      min-width: 180px;
-      -webkit-touch-callout: none;
-      -webkit-user-select: none;
-      user-select: none;
-    }
-    
-    .btn i {
-      font-size: 1.2rem;
-    }
-    
-    .btn-save {
-      background: var(--success);
-      color: white;
-      box-shadow: 0 4px 6px rgba(46, 204, 113, 0.3);
-    }
-    
-    .btn-save:hover, .btn-save:active {
-      background: #219653;
-      transform: translateY(-2px);
-    }
-    
-    .btn-reset {
-      background: white;
-      color: var(--secondary);
-      border: 1px solid var(--border);
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    
-    .btn-reset:hover, .btn-reset:active {
-      background: #f8f9fa;
-      border-color: var(--primary);
-      color: var(--primary);
-    }
-    
-    .btn-back {
-      background: var(--secondary);
-      color: white;
-      margin-bottom: 20px;
-    }
-    
-    /* CORRECTION: Bouton Nouveau dossier bien visible */
-    .btn-new-folder {
-      background: var(--primary);
-      color: white;
-      box-shadow: 0 4px 6px rgba(52, 152, 219, 0.3);
-      animation: pulse 2s infinite;
-    }
-    
-    .btn-new-folder:hover, .btn-new-folder:active {
-      background: #2980b9;
-      transform: translateY(-2px);
-    }
-    
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); }
-      70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
-    }
-    
-    /* Styles pour les photos */
-    .photos-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-      gap: 12px;
-      margin-top: 15px;
-    }
-
-    .photo-item {
-      position: relative;
-      aspect-ratio: 1/1;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
-    }
-
-    .photo-placeholder {
-      width: 100%;
-      height: 100%;
-      background-color: #e9ecef;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      color: var(--secondary);
-      border: 2px dashed var(--border);
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .photo-placeholder:hover {
-      background-color: #dee2e6;
-      border-color: var(--primary);
-    }
-
-    .photo-placeholder i {
-      font-size: 2rem;
-      margin-bottom: 8px;
-    }
-
-    .photo-item img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      cursor: pointer;
-    }
-
-    .photo-actions {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(0,0,0,0.7);
-      padding: 8px;
-      text-align: center;
-      transform: translateY(100%);
-      transition: transform 0.3s;
-    }
-
-    .photo-item:hover .photo-actions {
-      transform: translateY(0);
-    }
-
-    .photo-btn {
-      background: var(--danger);
-      color: white;
-      border: none;
-      border-radius: 4px;
-      padding: 4px 8px;
-      font-size: 0.8rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    /* Modal pour afficher les photos */
-    #photoModal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.9);
-      z-index: 2000;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-    }
-
-    #modalContent {
-      max-width: 90%;
-      max-height: 90%;
-      position: relative;
-    }
-
-    #modalContent img {
-      max-width: 100%;
-      max-height: 80vh;
-      display: block;
-      margin: 0 auto;
-      border-radius: 8px;
-    }
-
-    .photo-info {
-      color: white;
-      text-align: center;
-      margin-top: 15px;
-    }
-
-    .close-modal {
-      position: absolute;
-      top: -40px;
-      right: 0;
-      color: white;
-      font-size: 2rem;
-      cursor: pointer;
-      background: none;
-      border: none;
-    }
-    
-    /* Support du notch et de la safe area */
-    @supports (padding: max(0px)) {
-      body, header, .container {
-        padding-left: max(15px, env(safe-area-inset-left));
-        padding-right: max(15px, env(safe-area-inset-right));
-      }
-    }
-    
-    /* Modal de création de dossier */
-    #dossierModal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0,0,0,0.5);
-      z-index: 3000;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .modal-content {
-      background: white;
-      border-radius: 12px;
-      padding: 25px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    }
-    
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    
-    .modal-header h2 {
-      color: var(--secondary);
-    }
-    
-    .modal-close {
-      background: none;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: #7f8c8d;
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    .form-group label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-    }
-    
-    .form-group input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      font-size: 1rem;
-    }
-    
-    .modal-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-    }
-    
-    /* Page des soumissions */
-    .submission-item {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-      padding: 20px;
-      margin-bottom: 15px;
-      transition: transform 0.2s;
-    }
-    
-    .submission-item:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
-    }
-    
-    .submission-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    
-    .submission-title {
-      font-size: 1.2rem;
-      font-weight: 600;
-      color: var(--secondary);
-    }
-    
-    .submission-date {
-      color: #7f8c8d;
-      font-size: 0.85rem;
-    }
-    
-    .submission-address {
-      color: #34495e;
-      margin-bottom: 10px;
-    }
-    
-    .submission-meta {
-      display: flex;
-      gap: 10px;
-      font-size: 0.9rem;
-      color: #7f8c8d;
-    }
-    
-    .submission-meta span {
-      background: #f1f2f6;
-      padding: 4px 10px;
-      border-radius: 20px;
-    }
-    
-    .submission-actions {
-      display: flex;
-      gap: 10px;
-      margin-top: 15px;
-    }
-    
-    .btn-action {
-      padding: 8px 15px;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      transition: all 0.2s;
-    }
-    
-    .btn-view {
-      background: var(--primary);
-      color: white;
-      border: none;
-    }
-    
-    .btn-edit {
-      background: var(--warning);
-      color: white;
-      border: none;
-    }
-    
-    .btn-delete {
-      background: var(--danger);
-      color: white;
-      border: none;
-    }
-    
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: #7f8c8d;
-    }
-    
-    .empty-state i {
-      font-size: 3rem;
-      margin-bottom: 15px;
-      color: #b2bec3;
-    }
-    
-    .pagination {
-      display: flex;
-      justify-content: center;
-      margin-top: 20px;
-      gap: 10px;
-    }
-    
-    .pagination button {
-      padding: 8px 15px;
-      border: none;
-      border-radius: 6px;
-      background: white;
-      cursor: pointer;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .pagination button.active {
-      background: var(--primary);
-      color: white;
-    }
-    
-    @media (max-width: 768px) {
-      .grid-3 {
-        grid-template-columns: 1fr 1fr;
-      }
-      
-      .grid-2 {
-        grid-template-columns: 1fr;
-      }
-      
-      .button-container {
-        flex-direction: column;
-        gap: 12px;
-      }
-      
-      .btn {
-        width: 100%;
-      }
-      
-      .submission-actions {
-        flex-direction: column;
-      }
-      
-      .submission-meta {
-        flex-wrap: wrap;
-      }
-      
-      .folder-actions {
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      }
-    }
-</style>
-<link href="manifest.json" rel="manifest"/>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toit Pro | Gestion des soumissions</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2DBE60; /* Vert Evernote */
+            --secondary: #2D3848;
+            --sidebar: #F7F7F7;
+            --header: #FFFFFF;
+            --text: #333333;
+            --text-light: #777777;
+            --border: #E0E0E0;
+            --hover: #F5F5F5;
+            --active: #E3F2E8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            height: 100vh;
+            color: var(--text);
+        }
+        
+        /* Sidebar style */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo-container {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .nav-menu {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px 0;
+        }
+        
+        .nav-section {
+            margin-bottom: 20px;
+        }
+        
+        .nav-title {
+            padding: 5px 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 20px;
+            margin: 2px 0;
+            cursor: pointer;
+            border-radius: 0 5px 5px 0;
+            transition: all 0.2s;
+        }
+        
+        .nav-item:hover {
+            background: var(--hover);
+        }
+        
+        .nav-item.active {
+            background: var(--active);
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .nav-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Main content */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .header {
+            height: 60px;
+            background: var(--header);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 15px;
+        }
+        
+        .search-bar {
+            flex-grow: 1;
+            max-width: 600px;
+            position: relative;
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .content-area {
+            flex-grow: 1;
+            overflow: auto;
+            padding: 20px;
+            background: #FFFFFF;
+        }
+        
+        /* Notes list style */
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .notes-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .new-note-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        
+        .note-card {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        
+        .note-card:hover {
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .note-image {
+            height: 150px;
+            background: #F5F5F5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+        }
+        
+        .note-content {
+            padding: 15px;
+        }
+        
+        .note-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .note-excerpt {
+            font-size: 14px;
+            color: var(--text-light);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .note-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 70px;
+            }
+            
+            .logo span, .nav-item span {
+                display: none;
+            }
+            
+            .nav-item {
+                justify-content: center;
+                padding: 12px 0;
+            }
+            
+            .nav-item i {
+                margin-right: 0;
+                font-size: 18px;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-<header>
-<div class="logo">
-<i class="fas fa-home"></i>
-<h1>Toit Pro</h1>
-</div>
-</header>
-<!-- Page principale - Liste des dossiers -->
-<div id="main-page">
-<div class="search-container">
-<i class="fas fa-search"></i>
-<input id="search-input" placeholder="Rechercher un dossier..." type="text"/>
-</div>
-<div class="folder-container" id="dossiers-container">
-<!-- Les dossiers seront générés dynamiquement ici -->
-</div>
-<div class="button-container">
-<button class="btn btn-save" onclick="showForm()">
-<i class="fas fa-plus"></i> Nouvelle soumission
-</button>
-<button class="btn btn-reset" onclick="showSubmissionsPage()">
-<i class="fas fa-list"></i> Mes soumissions
-</button>
-<!-- CORRECTION: Bouton Nouveau dossier bien placé et visible -->
-<button class="btn btn-new-folder" onclick="showDossierModal()">
-<i class="fas fa-folder-plus"></i> Nouveau dossier
-</button>
-</div>
-</div>
-<!-- Page du formulaire de soumission -->
-<div id="form-page" style="display: none;">
-<button class="btn btn-back" onclick="hideForm()">
-<i class="fas fa-arrow-left"></i> Retour aux dossiers
-</button>
-<form id="soumissionForm">
-<input type="hidden" id="submissionId" value="">
-<!-- ... contenu du formulaire existant ... -->
-</form>
-</div>
-<!-- Page des dossiers par année -->
-<div id="year-page" style="display: none;">
-<button class="btn btn-back" onclick="backToMain()">
-<i class="fas fa-arrow-left"></i> Retour
-</button>
-<div class="folder-container" id="year-folders">
-<!-- Les sous-dossiers seront générés dynamiquement ici -->
-</div>
-</div>
-<!-- Page des soumissions existantes -->
-<div id="submissions-page" style="display: none;">
-<button class="btn btn-back" onclick="backToMain()">
-<i class="fas fa-arrow-left"></i> Retour
-</button>
-<div class="search-container">
-<i class="fas fa-search"></i>
-<input id="submission-search" placeholder="Rechercher une soumission..." type="text"/>
-</div>
-<div class="folder-container">
-<h2 style="margin-bottom: 20px;">Mes soumissions</h2>
-<div id="submissions-list">
-<!-- Les soumissions seront affichées ici dynamiquement -->
-</div>
-<div id="pagination-container" class="pagination"></div>
-</div>
-</div>
-</div>
-<div class="notification" id="notification">
-<i class="fas fa-check-circle"></i>
-<span id="notificationMessage"></span>
-</div>
-
-<!-- Modal pour afficher les photos -->
-<div id="photoModal">
-  <button class="close-modal" onclick="closeModal()">&times;</button>
-  <div id="modalContent"></div>
-</div>
-
-<!-- Modal pour créer un nouveau dossier -->
-<div id="dossierModal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h2>Créer un nouveau dossier</h2>
-      <button class="modal-close" onclick="closeDossierModal()">&times;</button>
-    </div>
-    <div class="form-group">
-      <label for="dossierNom">Nom du dossier</label>
-      <input type="text" id="dossierNom" placeholder="Ex: Projets 2024">
-    </div>
-    <div class="form-group">
-      <label for="dossierDescription">Description</label>
-      <input type="text" id="dossierDescription" placeholder="Ex: Projets de toiture pour 2024">
-    </div>
-    <div class="modal-actions">
-      <button class="btn btn-reset" onclick="closeDossierModal()">Annuler</button>
-      <button class="btn btn-save" onclick="createDossier()">Créer</button>
-    </div>
-  </div>
-</div>
-
-<script>
-    // Base de données unique
-    let soumissionsDB = JSON.parse(localStorage.getItem('soumissionsDB')) || [];
-    let projectPhotos = JSON.parse(localStorage.getItem('projectPhotos')) || [];
-    let currentSubmissionId = null;
-    let currentPage = 1;
-    const itemsPerPage = 5;
-    
-    // Base de données pour les dossiers
-    let dossiers = JSON.parse(localStorage.getItem('dossiers')) || [
-      { id: 'dossier_1', nom: '2023', description: '12 dossiers', count: 12 },
-      { id: 'dossier_2', nom: '2022', description: '8 dossiers', count: 8 },
-      { id: 'dossier_3', nom: '2021', description: '5 dossiers', count: 5 }
-    ];
-
-    // Initialisation
-    document.addEventListener('DOMContentLoaded', function() {
-      populateSelects();
-      setupSearch();
-      loadSavedPhotos();
-      renderDossiers();
-      
-      // Configuration de la recherche dans les soumissions
-      const searchInput = document.getElementById('submission-search');
-      searchInput.addEventListener('input', function() {
-        searchSubmissions(this.value);
-      });
-    });
-
-    // Rendu des dossiers
-    function renderDossiers() {
-      const container = document.getElementById('dossiers-container');
-      container.innerHTML = '';
-      
-      if (dossiers.length === 0) {
-        container.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-folder-open"></i>
-            <h3>Aucun dossier trouvé</h3>
-            <p>Créez votre premier dossier pour commencer</p>
-          </div>
-        `;
-        return;
-      }
-      
-      dossiers.forEach(dossier => {
-        const dossierElement = document.createElement('div');
-        dossierElement.className = 'folder-item';
-        dossierElement.innerHTML = `
-          <div class="folder-icon">
-            <i class="fas fa-folder"></i>
-          </div>
-          <div class="folder-content">
-            <h3>${dossier.nom}</h3>
-            <p>${dossier.description}</p>
-          </div>
-          <div class="folder-arrow" onclick="openYearFolder('${dossier.nom}')">
-            <i class="fas fa-chevron-right"></i>
-          </div>
-          <div class="folder-actions">
-            <button class="folder-action-btn" title="Supprimer" onclick="deleteDossier('${dossier.id}')">
-              <i class="fas fa-trash"></i>
-            </button>
-          </div>
-        `;
-        container.appendChild(dossierElement);
-      });
-    }
-    
-    // Sauvegarder les dossiers
-    function saveDossiers() {
-      localStorage.setItem('dossiers', JSON.stringify(dossiers));
-    }
-    
-    // Afficher le modal de création de dossier
-    function showDossierModal() {
-      document.getElementById('dossierModal').style.display = 'flex';
-      document.getElementById('dossierNom').value = '';
-      document.getElementById('dossierDescription').value = '';
-      document.getElementById('dossierNom').focus();
-    }
-    
-    // Fermer le modal de création de dossier
-    function closeDossierModal() {
-      document.getElementById('dossierModal').style.display = 'none';
-    }
-    
-    // Créer un nouveau dossier
-    function createDossier() {
-      const nom = document.getElementById('dossierNom').value.trim();
-      const description = document.getElementById('dossierDescription').value.trim();
-      
-      if (!nom) {
-        showNotification('Veuillez saisir un nom pour le dossier', 'error');
-        return;
-      }
-      
-      // Vérifier si le dossier existe déjà
-      if (dossiers.some(d => d.nom.toLowerCase() === nom.toLowerCase())) {
-        showNotification('Un dossier avec ce nom existe déjà', 'error');
-        return;
-      }
-      
-      const newDossier = {
-        id: 'dossier_' + Date.now(),
-        nom: nom,
-        description: description || '0 dossiers',
-        count: 0
-      };
-      
-      dossiers.push(newDossier);
-      saveDossiers();
-      renderDossiers();
-      closeDossierModal();
-      showNotification(`Dossier "${nom}" créé avec succès`, 'success');
-    }
-    
-    // Supprimer un dossier
-    function deleteDossier(id) {
-      const dossier = dossiers.find(d => d.id === id);
-      if (!dossier) return;
-      
-      if (confirm(`Êtes-vous sûr de vouloir supprimer le dossier "${dossier.nom}" ? Cette action est irréversible.`)) {
-        dossiers = dossiers.filter(d => d.id !== id);
-        saveDossiers();
-        renderDossiers();
-        showNotification(`Dossier "${dossier.nom}" supprimé`, 'success');
-      }
-    }
-    
-    // Configuration de la recherche principale
-    function setupSearch() {
-      const searchInput = document.getElementById('search-input');
-      searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        const folders = document.querySelectorAll('.folder-item');
-        
-        folders.forEach(folder => {
-          const title = folder.querySelector('h3').textContent.toLowerCase();
-          if (title.includes(searchTerm)) {
-            folder.style.display = 'flex';
-          } else {
-            folder.style.display = 'none';
-          }
-        });
-      });
-    }
-    
-    // Afficher le formulaire
-    function showForm() {
-      document.getElementById('main-page').style.display = 'none';
-      document.getElementById('form-page').style.display = 'block';
-      document.getElementById('year-page').style.display = 'none';
-      document.getElementById('submissions-page').style.display = 'none';
-      resetForm();
-    }
-    
-    // Masquer le formulaire
-    function hideForm() {
-      document.getElementById('main-page').style.display = 'block';
-      document.getElementById('form-page').style.display = 'none';
-      document.getElementById('year-page').style.display = 'none';
-      document.getElementById('submissions-page').style.display = 'none';
-    }
-    
-    // Afficher la page des soumissions
-    function showSubmissionsPage() {
-      document.getElementById('main-page').style.display = 'none';
-      document.getElementById('form-page').style.display = 'none';
-      document.getElementById('year-page').style.display = 'none';
-      document.getElementById('submissions-page').style.display = 'block';
-      loadSubmissions();
-    }
-    
-    // Charger les soumissions
-    function loadSubmissions(page = 1) {
-      currentPage = page;
-      const startIndex = (page - 1) * itemsPerPage;
-      const endIndex = startIndex + itemsPerPage;
-      const paginatedSubmissions = soumissionsDB.slice(startIndex, endIndex);
-      
-      const submissionsList = document.getElementById('submissions-list');
-      const paginationContainer = document.getElementById('pagination-container');
-      
-      if (soumissionsDB.length === 0) {
-        submissionsList.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-folder-open"></i>
-            <h3>Aucune soumission trouvée</h3>
-            <p>Créez votre première soumission pour commencer</p>
-          </div>
-        `;
-        paginationContainer.innerHTML = '';
-        return;
-      }
-      
-      submissionsList.innerHTML = '';
-      
-      paginatedSubmissions.forEach((submission, index) => {
-        const submissionItem = document.createElement('div');
-        submissionItem.className = 'submission-item';
-        submissionItem.innerHTML = `
-          <div class="submission-header">
-            <div class="submission-title">${submission.client.nom}</div>
-            <div class="submission-date">${new Date(submission.date).toLocaleDateString('fr-CA')}</div>
-          </div>
-          <div class="submission-address">${submission.client.adresse}</div>
-          <div class="submission-meta">
-            <span>${submission.toiture.superficie_totale} pi²</span>
-            <span>${submission.materiaux.feuilles} feuilles</span>
-            <span>${submission.photos.length} photos</span>
-          </div>
-          <div class="submission-actions">
-            <button class="btn-action btn-view" onclick="viewSubmission('${submission.id}')">
-              <i class="fas fa-eye"></i> Voir
-            </button>
-            <button class="btn-action btn-edit" onclick="editSubmission('${submission.id}')">
-              <i class="fas fa-edit"></i> Modifier
-            </button>
-            <button class="btn-action btn-delete" onclick="deleteSubmission('${submission.id}')">
-              <i class="fas fa-trash"></i> Supprimer
-            </button>
-          </div>
-        `;
-        submissionsList.appendChild(submissionItem);
-      });
-      
-      // Pagination
-      const totalPages = Math.ceil(soumissionsDB.length / itemsPerPage);
-      paginationContainer.innerHTML = '';
-      
-      if (totalPages > 1) {
-        for (let i = 1; i <= totalPages; i++) {
-          const btn = document.createElement('button');
-          btn.textContent = i;
-          if (i === currentPage) {
-            btn.classList.add('active');
-          }
-          btn.onclick = () => loadSubmissions(i);
-          paginationContainer.appendChild(btn);
-        }
-      }
-    }
-    
-    // Rechercher dans les soumissions
-    function searchSubmissions(term) {
-      term = term.toLowerCase().trim();
-      
-      if (!term) {
-        loadSubmissions();
-        return;
-      }
-      
-      const filtered = soumissionsDB.filter(sub => 
-        sub.client.nom.toLowerCase().includes(term) || 
-        sub.client.adresse.toLowerCase().includes(term) ||
-        sub.client.telephone.includes(term) ||
-        sub.notes.toLowerCase().includes(term)
-      );
-      
-      const submissionsList = document.getElementById('submissions-list');
-      submissionsList.innerHTML = '';
-      
-      if (filtered.length === 0) {
-        submissionsList.innerHTML = `
-          <div class="empty-state">
-            <i class="fas fa-search"></i>
-            <h3>Aucun résultat trouvé</h3>
-            <p>Essayez avec d'autres termes de recherche</p>
-          </div>
-        `;
-        document.getElementById('pagination-container').innerHTML = '';
-        return;
-      }
-      
-      filtered.forEach(submission => {
-        const submissionItem = document.createElement('div');
-        submissionItem.className = 'submission-item';
-        submissionItem.innerHTML = `
-          <div class="submission-header">
-            <div class="submission-title">${submission.client.nom}</div>
-            <div class="submission-date">${new Date(submission.date).toLocaleDateString('fr-CA')}</div>
-          </div>
-          <div class="submission-address">${submission.client.adresse}</div>
-          <div class="submission-meta">
-            <span>${submission.toiture.superficie_totale} pi²</span>
-            <span>${submission.materiaux.feuilles} feuilles</span>
-            <span>${submission.photos.length} photos</span>
-          </div>
-          <div class="submission-actions">
-            <button class="btn-action btn-view" onclick="viewSubmission('${submission.id}')">
-              <i class="fas fa-eye"></i> Voir
-            </button>
-            <button class="btn-action btn-edit" onclick="editSubmission('${submission.id}')">
-              <i class="fas fa-edit"></i> Modifier
-            </button>
-            <button class="btn-action btn-delete" onclick="deleteSubmission('${submission.id}')">
-              <i class="fas fa-trash"></i> Supprimer
-            </button>
-          </div>
-        `;
-        submissionsList.appendChild(submissionItem);
-      });
-      
-      document.getElementById('pagination-container').innerHTML = '';
-    }
-    
-    // Ouvrir un dossier année
-    function openYearFolder(year) {
-      document.getElementById('main-page').style.display = 'none';
-      document.getElementById('form-page').style.display = 'none';
-      document.getElementById('year-page').style.display = 'block';
-      document.getElementById('submissions-page').style.display = 'none';
-      
-      const yearFolders = document.getElementById('year-folders');
-      yearFolders.innerHTML = `
-        <div class="folder-item" onclick="openSubFolder('${year}', 'Soumission')">
-          <div class="folder-icon" style="background-color: var(--primary);">
-            <i class="fas fa-file-signature"></i>
-          </div>
-          <div class="folder-content">
-            <h3>Soumission</h3>
-            <p>Documents de soumission</p>
-          </div>
-          <div class="folder-arrow">
-            <i class="fas fa-chevron-right"></i>
-          </div>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-home"></i>
+                <span>Toit Pro</span>
+            </div>
         </div>
         
-        <div class="folder-item" onclick="openSubFolder('${year}', 'Contrat')">
-          <div class="folder-icon" style="background-color: var(--success);">
-            <i class="fas fa-file-contract"></i>
-          </div>
-          <div class="folder-content">
-            <h3>Contrat</h3>
-            <p>Contrats signés</p>
-          </div>
-          <div class="folder-arrow">
-            <i class="fas fa-chevron-right"></i>
-          </div>
+        <div class="nav-menu">
+            <div class="nav-section">
+                <div class="nav-title">Menu</div>
+                <div class="nav-item active">
+                    <i class="fas fa-home"></i>
+                    <span>Tableau de bord</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Soumissions</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-folder"></i>
+                    <span>Dossiers</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-file-contract"></i>
+                    <span>Contrats</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Outils</div>
+                <div class="nav-item">
+                    <i class="fas fa-calculator"></i>
+                    <span>Calculatrice</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-camera"></i>
+                    <span>Photos</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-ruler-combined"></i>
+                    <span>Dimensions</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">Tags</div>
+                <div class="nav-item">
+                    <i class="fas fa-tag" style="color: #FF9500;"></i>
+                    <span>Urgent</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-tag" style="color: #FF2D55;"></i>
+                    <span>Client VIP</span>
+                </div>
+                <div class="nav-item">
+                    <i class="fas fa-tag" style="color: #5856D6;"></i>
+                    <span>Commercial</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="header">
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Rechercher une soumission, un client...">
+            </div>
+            
+            <div class="user-menu">
+                <i class="fas fa-bell" style="font-size: 18px;"></i>
+                <div style="width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                    MP
+                </div>
+            </div>
         </div>
         
-        <div class="folder-item" onclick="openSubFolder('${year}', 'Reparage')">
-          <div class="folder-icon" style="background-color: var(--warning);">
-            <i class="fas fa-tools"></i>
-          </div>
-          <div class="folder-content">
-            <h3>Réparage</h3>
-            <p>Documents de réparation</p>
-          </div>
-          <div class="folder-arrow">
-            <i class="fas fa-chevron-right"></i>
-          </div>
+        <div class="content-area">
+            <div class="notes-header">
+                <h2 class="notes-title">Mes soumissions récentes</h2>
+                <button class="new-note-btn">
+                    <i class="fas fa-plus"></i>
+                    Nouvelle soumission
+                </button>
+            </div>
+            
+            <div class="notes-grid">
+                <!-- Note 1 -->
+                <div class="note-card">
+                    <div class="note-image">
+                        <i class="fas fa-home" style="font-size: 40px;"></i>
+                    </div>
+                    <div class="note-content">
+                        <div class="note-title">Projet Dubois - Toiture résidentielle</div>
+                        <div class="note-excerpt">
+                            Soumission complète pour la rénovation de toiture avec matériaux premium et garantie de 15 ans.
+                        </div>
+                        <div class="note-footer">
+                            <span>15/06/2023</span>
+                            <span><i class="fas fa-tag" style="color: #FF9500;"></i></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Note 2 -->
+                <div class="note-card">
+                    <div class="note-image">
+                        <i class="fas fa-building" style="font-size: 40px;"></i>
+                    </div>
+                    <div class="note-content">
+                        <div class="note-title">Complexe commercial Laval</div>
+                        <div class="note-excerpt">
+                            Devis pour toiture plate de 8500 pi² avec système de drainage intégré.
+                        </div>
+                        <div class="note-footer">
+                            <span>08/06/2023</span>
+                            <span><i class="fas fa-tag" style="color: #5856D6;"></i></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Note 3 -->
+                <div class="note-card">
+                    <div class="note-image">
+                        <i class="fas fa-warehouse" style="font-size: 40px;"></i>
+                    </div>
+                    <div class="note-content">
+                        <div class="note-title">Entrepôt ABC Manufacturing</div>
+                        <div class="note-excerpt">
+                            Proposition pour toiture métallique industrielle avec isolation renforcée.
+                        </div>
+                        <div class="note-footer">
+                            <span>02/06/2023</span>
+                            <span><i class="fas fa-tag" style="color: #FF2D55;"></i></span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Note 4 -->
+                <div class="note-card">
+                    <div class="note-image">
+                        <i class="fas fa-home" style="font-size: 40px;"></i>
+                    </div>
+                    <div class="note-content">
+                        <div class="note-title">Rénovation Tremblay</div>
+                        <div class="note-excerpt">
+                            Remplacement complet de la toiture avec bardeaux architecturaux et nouvel éventilation.
+                        </div>
+                        <div class="note-footer">
+                            <span>28/05/2023</span>
+                            <span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div class="folder-item" onclick="openSubFolder('${year}', 'Inspection')">
-          <div class="folder-icon" style="background-color: var(--danger);">
-            <i class="fas fa-search"></i>
-          </div>
-          <div class="folder-content">
-            <h3>Inspection</h3>
-            <p>Rapports d'inspection</p>
-          </div>
-          <div class="folder-arrow">
-            <i class="fas fa-chevron-right"></i>
-          </div>
-        </div>
-      `;
-    }
-    
-    // Ouvrir un sous-dossier
-    function openSubFolder(year, type) {
-      showNotification(`Ouverture des ${type} pour ${year}`, 'success');
-    }
-    
-    // Retour à la page principale
-    function backToMain() {
-      document.getElementById('main-page').style.display = 'block';
-      document.getElementById('form-page').style.display = 'none';
-      document.getElementById('year-page').style.display = 'none';
-      document.getElementById('submissions-page').style.display = 'none';
-    }
-    
-    // Remplir les sélecteurs
-    function populateSelects() {
-      // Dimensions principales et puit de lumière (0 à 200)
-      const dimensionSelects = document.querySelectorAll(`
-        select[id^="dimension"], 
-        #puitLumiere1Dim1, #puitLumiere1Dim2,
-        #puitLumiere2Dim1, #puitLumiere2Dim2
-      `);
-      
-      dimensionSelects.forEach(select => {
-        // Conserver l'option par défaut
-        const defaultOption = select.options[0];
-        select.innerHTML = '';
-        select.appendChild(defaultOption);
-        
-        // Ajouter les options de 1 à 200
-        for (let i = 1; i <= 200; i++) {
-          const option = document.createElement('option');
-          option.value = i;
-          option.textContent = i;
-          select.appendChild(option);
-        }
-      });
-      
-      // Autres sélecteurs (0 à 50)
-      const smallSelects = [
-        'nbFeuilles', 'nbMax', 'nbEvents', 'nbDrains',
-        'trepiedElectrique', 'ff180', 'armorbound180'
-      ];
-      
-      smallSelects.forEach(id => {
-        const select = document.getElementById(id);
-        for (let i = 0; i <= 50; i++) {
-          const option = document.createElement('option');
-          option.value = i;
-          option.textContent = i;
-          select.appendChild(option);
-        }
-      });
-    }
-    
-    // Calcul de la superficie avec déduction des puits de lumière
-    function calculerSuperficie() {
-      const dim1 = parseFloat(document.getElementById('dimension1').value) || 0;
-      const dim2 = parseFloat(document.getElementById('dimension2').value) || 0;
-      const dim3 = parseFloat(document.getElementById('dimension3').value) || 0;
-      const dim4 = parseFloat(document.getElementById('dimension4').value) || 0;
-      
-      // Calcul des puits de lumière
-      const pl1Dim1 = parseFloat(document.getElementById('puitLumiere1Dim1').value) || 0;
-      const pl1Dim2 = parseFloat(document.getElementById('puitLumiere1Dim2').value) || 0;
-      const pl2Dim1 = parseFloat(document.getElementById('puitLumiere2Dim1').value) || 0;
-      const pl2Dim2 = parseFloat(document.getElementById('puitLumiere2Dim2').value) || 0;
-      
-      const superficieTotale = (dim1 * dim2) + (dim3 * dim4);
-      const superficiePuitsLumiere = (pl1Dim1 * pl1Dim2) + (pl2Dim1 * pl2Dim2);
-      
-      const superficieNet = Math.max(0, superficieTotale - superficiePuitsLumiere);
-      document.getElementById('superficie').textContent = superficieNet;
-    }
-    
-    // Fonction pour prendre une photo (avec optimisation)
-    function takePhoto() {
-      // Créer un élément input de type file
-      const input = document.createElement('input');
-      input.type = 'file';
-      input.accept = 'image/*';
-      input.capture = 'camera'; // Pour forcer l'appareil photo sur mobile
-      
-      input.onchange = function(e) {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          
-          reader.onload = function(event) {
-            compressImage(event.target.result, function(compressedData) {
-              const photoData = {
-                id: 'photo_' + Date.now(),
-                data: compressedData,
-                date: new Date().toLocaleString(),
-                description: 'Photo du projet'
-              };
-              
-              projectPhotos.push(photoData);
-              updatePhotoGrid();
-              savePhotosToLocalStorage();
-              
-              showNotification('Photo ajoutée avec succès', 'success');
+    </div>
+
+    <script>
+        // Fonctionnalité de recherche
+        const searchInput = document.querySelector('.search-bar input');
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const noteCards = document.querySelectorAll('.note-card');
+            
+            noteCards.forEach(card => {
+                const title = card.querySelector('.note-title').textContent.toLowerCase();
+                const excerpt = card.querySelector('.note-excerpt').textContent.toLowerCase();
+                
+                if (title.includes(searchTerm) || excerpt.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
             });
-          };
-          
-          reader.readAsDataURL(file);
-        }
-      };
-      
-      input.click();
-    }
-    
-    // Compression d'image pour réduire la taille
-    function compressImage(dataUrl, callback) {
-      const img = new Image();
-      img.src = dataUrl;
-      
-      img.onload = function() {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
+        });
         
-        // Définir les dimensions maximales
-        const MAX_WIDTH = 800;
-        const MAX_HEIGHT = 800;
-        let width = img.width;
-        let height = img.height;
-        
-        // Redimensionner si nécessaire
-        if (width > height) {
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
-        } else {
-          if (height > MAX_HEIGHT) {
-            width *= MAX_HEIGHT / height;
-            height = MAX_HEIGHT;
-          }
-        }
-        
-        canvas.width = width;
-        canvas.height = height;
-        
-        // Dessiner l'image sur le canvas
-        ctx.drawImage(img, 0, 0, width, height);
-        
-        // Convertir en format JPEG avec qualité 80%
-        const compressedData = canvas.toDataURL('image/jpeg', 0.8);
-        callback(compressedData);
-      };
-    }
-    
-    // Mettre à jour la grille de photos
-    function updatePhotoGrid() {
-      const photosGrid = document.querySelector('.photos-grid');
-      photosGrid.innerHTML = '';
-      
-      // Ajouter les photos existantes
-      projectPhotos.forEach((photo, index) => {
-        const photoItem = document.createElement('div');
-        photoItem.className = 'photo-item';
-        
-        const img = document.createElement('img');
-        img.src = photo.data;
-        img.alt = photo.description;
-        img.onclick = () => showPhoto(photo.data, photo.description, photo.date);
-        
-        const photoActions = document.createElement('div');
-        photoActions.className = 'photo-actions';
-        
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'photo-btn';
-        deleteBtn.innerHTML = '<i class="fas fa-trash"></i> Supprimer';
-        deleteBtn.onclick = (e) => {
-          e.stopPropagation();
-          deletePhoto(index);
-        };
-        
-        photoActions.appendChild(deleteBtn);
-        photoItem.appendChild(img);
-        photoItem.appendChild(photoActions);
-        photosGrid.appendChild(photoItem);
-      });
-      
-      // Ajouter le bouton pour ajouter une nouvelle photo
-      const addPhotoItem = document.createElement('div');
-      addPhotoItem.className = 'photo-item';
-      
-      const addPhotoPlaceholder = document.createElement('div');
-      addPhotoPlaceholder.className = 'photo-placeholder';
-      addPhotoPlaceholder.onclick = takePhoto;
-      
-      addPhotoPlaceholder.innerHTML = `
-        <i class="fas fa-plus-circle"></i>
-        <span>Ajouter</span>
-      `;
-      
-      addPhotoItem.appendChild(addPhotoPlaceholder);
-      photosGrid.appendChild(addPhotoItem);
-    }
-    
-    // Supprimer une photo
-    function deletePhoto(index) {
-      projectPhotos.splice(index, 1);
-      updatePhotoGrid();
-      savePhotosToLocalStorage();
-      showNotification('Photo supprimée', 'success');
-    }
-    
-    // Afficher une photo en grand
-    function showPhoto(src, description, date) {
-      const modalContent = document.getElementById('modalContent');
-      
-      modalContent.innerHTML = `
-        <img src="${src}" alt="${description}">
-        <div class="photo-info">
-          <p>${description}</p>
-          <p><small>${date}</small></p>
-        </div>
-      `;
-      document.getElementById('photoModal').style.display = 'flex';
-    }
-    
-    // Fermer le modal
-    function closeModal() {
-      document.getElementById('photoModal').style.display = 'none';
-    }
-    
-    // Sauvegarder les photos dans le localStorage
-    function savePhotosToLocalStorage() {
-      localStorage.setItem('projectPhotos', JSON.stringify(projectPhotos));
-    }
-    
-    // Charger les photos sauvegardées
-    function loadSavedPhotos() {
-      const savedPhotos = localStorage.getItem('projectPhotos');
-      if (savedPhotos) {
-        try {
-          projectPhotos = JSON.parse(savedPhotos);
-          updatePhotoGrid();
-        } catch (e) {
-          console.error('Erreur de chargement des photos:', e);
-          projectPhotos = [];
-        }
-      }
-    }
-    
-    // Réinitialisation
-    function resetForm() {
-      document.getElementById('soumissionForm').reset();
-      document.getElementById('superficie').textContent = '0';
-      projectPhotos = [];
-      updatePhotoGrid();
-      localStorage.removeItem('projectPhotos');
-      currentSubmissionId = null;
-      document.getElementById('submissionId').value = '';
-    }
-    
-    // Notifications
-    function showNotification(message, type) {
-      const notification = document.getElementById('notification');
-      const messageElement = document.getElementById('notificationMessage');
-      const icon = notification.querySelector('i');
-      
-      // Changer l'icône selon le type
-      if (type === 'success') {
-        icon.className = 'fas fa-check-circle';
-      } else {
-        icon.className = 'fas fa-exclamation-circle';
-      }
-      
-      messageElement.textContent = message;
-      notification.className = `notification ${type} show`;
-      
-      setTimeout(() => {
-        notification.classList.remove('show');
-      }, 3000);
-    }
-    
-    // Enregistrement
-    function enregistrerSoumission() {
-      const adresse = document.getElementById('adresse').value.trim();
-      if (!adresse) {
-        showNotification('Veuillez saisir une adresse', 'error');
-        return;
-      }
-      
-      const soumissionId = document.getElementById('submissionId').value;
-      const soumission = {
-        id: soumissionId || 'soum_' + Date.now(),
-        date: new Date().toISOString(),
-        annee: new Date().getFullYear(),
-        type: 'Soumission',
-        client: {
-          nom: document.getElementById('nom').value,
-          adresse: adresse,
-          telephone: document.getElementById('telephone').value,
-          courriel: document.getElementById('courriel').value
-        },
-        toiture: {
-          dimensions: [
-            { valeur: document.getElementById('dimension1').value },
-            { valeur: document.getElementById('dimension2').value },
-            { valeur: document.getElementById('dimension3').value },
-            { valeur: document.getElementById('dimension4').value }
-          ],
-          superficie_totale: document.getElementById('superficie').textContent,
-          plusieurs_epaisseurs: document.getElementById('plusieursEpaisseurs').checked
-        },
-        materiaux: {
-          feuilles: document.getElementById('nbFeuilles').value,
-          max: document.getElementById('nbMax').value,
-          events: document.getElementById('nbEvents').value,
-          drains: document.getElementById('nbDrains').value,
-          trepied_electrique: document.getElementById('trepiedElectrique').value,
-          ff180: document.getElementById('ff180').value,
-          armorbound180: document.getElementById('armorbound180').value,
-          puit_lumiere_1: {
-            dim1: document.getElementById('puitLumiere1Dim1').value,
-            dim2: document.getElementById('puitLumiere1Dim2').value
-          },
-          puit_lumiere_2: {
-            dim1: document.getElementById('puitLumiere2Dim1').value,
-            dim2: document.getElementById('puitLumiere2Dim2').value
-          }
-        },
-        options: {
-          hydro_quebec: document.getElementById('hydroQuebec').checked,
-          grue: document.getElementById('grue').checked,
-          trackfall: document.getElementById('trackfall').checked
-        },
-        notes: document.getElementById('notes').value,
-        photos: projectPhotos
-      };
-      
-      // Mise à jour ou ajout
-      if (soumissionId) {
-        const index = soumissionsDB.findIndex(s => s.id === soumissionId);
-        if (index !== -1) {
-          soumissionsDB[index] = soumission;
-          showNotification('Soumission mise à jour avec succès', 'success');
-        }
-      } else {
-        soumissionsDB.push(soumission);
-        showNotification('Nouvelle soumission enregistrée', 'success');
-      }
-      
-      // Sauvegarder dans la base de données
-      localStorage.setItem('soumissionsDB', JSON.stringify(soumissionsDB));
-      
-      // Télécharger le fichier JSON
-      const dataStr = JSON.stringify(soumission, null, 2);
-      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-      const nomFichier = `Soumission_${soumission.date.substring(0,10)}_${adresse.replace(/[^a-z0-9]/gi, '_')}.json`;
-      
-      const linkElement = document.createElement('a');
-      linkElement.setAttribute('href', dataUri);
-      linkElement.setAttribute('download', nomFichier);
-      document.body.appendChild(linkElement);
-      
-      linkElement.click();
-      document.body.removeChild(linkElement);
-      
-      resetForm();
-      hideForm();
-      showSubmissionsPage();
-    }
-    
-    // Visualiser une soumission
-    function viewSubmission(id) {
-      const submission = soumissionsDB.find(s => s.id === id);
-      if (!submission) return;
-      
-      // Afficher les détails dans un modal (simplifié pour l'exemple)
-      alert(`Soumission de ${submission.client.nom}\nAdresse: ${submission.client.adresse}\nSuperficie: ${submission.toiture.superficie_totale} pi²`);
-    }
-    
-    // Modifier une soumission
-    function editSubmission(id) {
-      const submission = soumissionsDB.find(s => s.id === id);
-      if (!submission) return;
-      
-      // Remplir le formulaire
-      document.getElementById('submissionId').value = submission.id;
-      document.getElementById('nom').value = submission.client.nom;
-      document.getElementById('adresse').value = submission.client.adresse;
-      document.getElementById('telephone').value = submission.client.telephone;
-      document.getElementById('courriel').value = submission.client.courriel;
-      
-      // Dimensions
-      document.getElementById('dimension1').value = submission.toiture.dimensions[0].valeur;
-      document.getElementById('dimension2').value = submission.toiture.dimensions[1].valeur;
-      document.getElementById('dimension3').value = submission.toiture.dimensions[2].valeur;
-      document.getElementById('dimension4').value = submission.toiture.dimensions[3].valeur;
-      
-      // Matériaux
-      document.getElementById('nbFeuilles').value = submission.materiaux.feuilles;
-      document.getElementById('nbMax').value = submission.materiaux.max;
-      document.getElementById('nbEvents').value = submission.materiaux.events;
-      document.getElementById('nbDrains').value = submission.materiaux.drains;
-      document.getElementById('trepiedElectrique').value = submission.materiaux.trepied_electrique;
-      document.getElementById('ff180').value = submission.materiaux.ff180;
-      document.getElementById('armorbound180').value = submission.materiaux.armorbound180;
-      
-      // Puits de lumière
-      document.getElementById('puitLumiere1Dim1').value = submission.materiaux.puit_lumiere_1.dim1;
-      document.getElementById('puitLumiere1Dim2').value = submission.materiaux.puit_lumiere_1.dim2;
-      document.getElementById('puitLumiere2Dim1').value = submission.materiaux.puit_lumiere_2.dim1;
-      document.getElementById('puitLumiere2Dim2').value = submission.materiaux.puit_lumiere_2.dim2;
-      
-      // Options
-      document.getElementById('plusieursEpaisseurs').checked = submission.toiture.plusieurs_epaisseurs;
-      document.getElementById('hydroQuebec').checked = submission.options.hydro_quebec;
-      document.getElementById('grue').checked = submission.options.grue;
-      document.getElementById('trackfall').checked = submission.options.trackfall;
-      
-      // Notes
-      document.getElementById('notes').value = submission.notes;
-      
-      // Photos
-      projectPhotos = submission.photos;
-      updatePhotoGrid();
-      
-      // Calculer la superficie
-      calculerSuperficie();
-      
-      // Afficher le formulaire
-      document.getElementById('main-page').style.display = 'none';
-      document.getElementById('form-page').style.display = 'block';
-      document.getElementById('year-page').style.display = 'none';
-      document.getElementById('submissions-page').style.display = 'none';
-      
-      showNotification('Soumission chargée pour modification', 'success');
-    }
-    
-    // Supprimer une soumission
-    function deleteSubmission(id) {
-      if (confirm('Êtes-vous sûr de vouloir supprimer cette soumission ? Cette action est irréversible.')) {
-        soumissionsDB = soumissionsDB.filter(s => s.id !== id);
-        localStorage.setItem('soumissionsDB', JSON.stringify(soumissionsDB));
-        showNotification('Soumission supprimée', 'success');
-        loadSubmissions(currentPage);
-      }
-    }
-    
-    // Service Worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log("Service Worker enregistré"))
-        .catch(error => console.error("Erreur Service Worker :", error));
-    }
-</script>
+        // Sélection d'éléments du menu
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => {
+            item.addEventListener('click', function() {
+                navItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
 </body>
 </html>
