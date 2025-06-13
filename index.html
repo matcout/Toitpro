@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Toit Pro | Gestion des soumissions</title>
+    <link rel="manifest" href="manifest.json">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #2DBE60; /* Vert Evernote */
+            --primary: #2DBE60;
             --secondary: #2D3848;
             --sidebar: #F7F7F7;
             --header: #FFFFFF;
@@ -16,6 +17,7 @@
             --border: #E0E0E0;
             --hover: #F5F5F5;
             --active: #E3F2E8;
+            --card-bg: #FFFFFF;
         }
         
         * {
@@ -29,6 +31,7 @@
             display: flex;
             height: 100vh;
             color: var(--text);
+            background: #f0f2f5;
         }
         
         /* Sidebar style */
@@ -38,20 +41,28 @@
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
+            transition: width 0.3s;
         }
         
         .logo-container {
             padding: 20px;
             border-bottom: 1px solid var(--border);
-        }
-        
-        .logo {
             display: flex;
             align-items: center;
             gap: 10px;
+        }
+        
+        .logo {
             font-size: 20px;
             font-weight: 600;
             color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 24px;
         }
         
         .nav-menu {
@@ -76,7 +87,7 @@
         .nav-item {
             display: flex;
             align-items: center;
-            padding: 8px 20px;
+            padding: 10px 20px;
             margin: 2px 0;
             cursor: pointer;
             border-radius: 0 5px 5px 0;
@@ -97,6 +108,7 @@
             margin-right: 10px;
             width: 20px;
             text-align: center;
+            font-size: 18px;
         }
         
         /* Main content */
@@ -115,6 +127,15 @@
             align-items: center;
             padding: 0 20px;
             gap: 15px;
+        }
+        
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text);
         }
         
         .search-bar {
@@ -149,7 +170,7 @@
             flex-grow: 1;
             overflow: auto;
             padding: 20px;
-            background: #FFFFFF;
+            background: #f9f9f9;
         }
         
         /* Notes list style */
@@ -158,6 +179,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         
         .notes-title {
@@ -169,40 +192,50 @@
             background: var(--primary);
             color: white;
             border: none;
-            padding: 8px 15px;
+            padding: 10px 15px;
             border-radius: 5px;
             font-weight: 500;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .new-note-btn:hover {
+            background: #25a955;
+            transform: translateY(-2px);
         }
         
         .notes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 20px;
         }
         
         .note-card {
+            background: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 8px;
             overflow: hidden;
             transition: all 0.2s;
             cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
         .note-card:hover {
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
         }
         
         .note-image {
-            height: 150px;
-            background: #F5F5F5;
+            height: 160px;
+            background: linear-gradient(135deg, #f5f7fa, #e4e7eb);
             display: flex;
             align-items: center;
             justify-content: center;
             color: var(--text-light);
+            font-size: 40px;
         }
         
         .note-content {
@@ -211,10 +244,11 @@
         
         .note-title {
             font-weight: 600;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            font-size: 18px;
         }
         
         .note-excerpt {
@@ -224,41 +258,103 @@
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
+            line-height: 1.5;
+            margin-bottom: 10px;
         }
         
         .note-footer {
             display: flex;
             justify-content: space-between;
             margin-top: 10px;
-            font-size: 12px;
+            font-size: 13px;
             color: var(--text-light);
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+        }
+        
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #fef9e7;
+            color: #d4ac0d;
+        }
+        
+        .status-approved {
+            background: #e8f8f0;
+            color: #28b463;
         }
         
         /* Responsive */
-        @media (max-width: 768px) {
+        @media (max-width: 992px) {
             .sidebar {
-                width: 70px;
+                position: fixed;
+                left: -280px;
+                height: 100vh;
+                z-index: 100;
+                background: white;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             }
             
-            .logo span, .nav-item span {
-                display: none;
+            .sidebar.active {
+                left: 0;
             }
             
-            .nav-item {
-                justify-content: center;
-                padding: 12px 0;
+            .menu-toggle {
+                display: block;
             }
             
-            .nav-item i {
-                margin-right: 0;
-                font-size: 18px;
+            .notes-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             }
+        }
+        
+        @media (max-width: 768px) {
+            .notes-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 0 15px;
+            }
+            
+            .user-menu {
+                gap: 10px;
+            }
+        }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+        
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+        
+        .empty-state p {
+            max-width: 500px;
+            margin: 0 auto 20px;
         }
     </style>
 </head>
 <body>
     <!-- Sidebar -->
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="logo-container">
             <div class="logo">
                 <i class="fas fa-home"></i>
@@ -285,37 +381,25 @@
                     <i class="fas fa-file-contract"></i>
                     <span>Contrats</span>
                 </div>
-            </div>
-            
-            <div class="nav-section">
-                <div class="nav-title">Outils</div>
                 <div class="nav-item">
-                    <i class="fas fa-calculator"></i>
-                    <span>Calculatrice</span>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-camera"></i>
-                    <span>Photos</span>
-                </div>
-                <div class="nav-item">
-                    <i class="fas fa-ruler-combined"></i>
-                    <span>Dimensions</span>
+                    <i class="fas fa-users"></i>
+                    <span>Clients</span>
                 </div>
             </div>
             
             <div class="nav-section">
-                <div class="nav-title">Tags</div>
+                <div class="nav-title">Archives</div>
                 <div class="nav-item">
-                    <i class="fas fa-tag" style="color: #FF9500;"></i>
-                    <span>Urgent</span>
+                    <i class="fas fa-archive"></i>
+                    <span>2023</span>
                 </div>
                 <div class="nav-item">
-                    <i class="fas fa-tag" style="color: #FF2D55;"></i>
-                    <span>Client VIP</span>
+                    <i class="fas fa-archive"></i>
+                    <span>2022</span>
                 </div>
                 <div class="nav-item">
-                    <i class="fas fa-tag" style="color: #5856D6;"></i>
-                    <span>Commercial</span>
+                    <i class="fas fa-archive"></i>
+                    <span>2021</span>
                 </div>
             </div>
         </div>
@@ -324,6 +408,10 @@
     <!-- Main content -->
     <div class="main-content">
         <div class="header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
             <div class="search-bar">
                 <i class="fas fa-search"></i>
                 <input type="text" placeholder="Rechercher une soumission, un client...">
@@ -339,7 +427,7 @@
         
         <div class="content-area">
             <div class="notes-header">
-                <h2 class="notes-title">Mes soumissions récentes</h2>
+                <h2 class="notes-title">Soumissions récentes</h2>
                 <button class="new-note-btn">
                     <i class="fas fa-plus"></i>
                     Nouvelle soumission
@@ -347,10 +435,10 @@
             </div>
             
             <div class="notes-grid">
-                <!-- Note 1 -->
+                <!-- Soumission 1 -->
                 <div class="note-card">
                     <div class="note-image">
-                        <i class="fas fa-home" style="font-size: 40px;"></i>
+                        <i class="fas fa-home"></i>
                     </div>
                     <div class="note-content">
                         <div class="note-title">Projet Dubois - Toiture résidentielle</div>
@@ -358,59 +446,59 @@
                             Soumission complète pour la rénovation de toiture avec matériaux premium et garantie de 15 ans.
                         </div>
                         <div class="note-footer">
-                            <span>15/06/2023</span>
-                            <span><i class="fas fa-tag" style="color: #FF9500;"></i></span>
+                            <span><i class="fas fa-calendar"></i> 15/06/2023</span>
+                            <span class="status-badge status-approved">Approuvé</span>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Note 2 -->
+                <!-- Soumission 2 -->
                 <div class="note-card">
                     <div class="note-image">
-                        <i class="fas fa-building" style="font-size: 40px;"></i>
+                        <i class="fas fa-building"></i>
                     </div>
                     <div class="note-content">
                         <div class="note-title">Complexe commercial Laval</div>
                         <div class="note-excerpt">
-                            Devis pour toiture plate de 8500 pi² avec système de drainage intégré.
+                            Devis pour toiture plate de 8500 pi² avec système de drainage intégré. Estimation des matériaux et main d'œuvre.
                         </div>
                         <div class="note-footer">
-                            <span>08/06/2023</span>
-                            <span><i class="fas fa-tag" style="color: #5856D6;"></i></span>
+                            <span><i class="fas fa-calendar"></i> 08/06/2023</span>
+                            <span class="status-badge status-pending">En attente</span>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Note 3 -->
+                <!-- Soumission 3 -->
                 <div class="note-card">
                     <div class="note-image">
-                        <i class="fas fa-warehouse" style="font-size: 40px;"></i>
+                        <i class="fas fa-warehouse"></i>
                     </div>
                     <div class="note-content">
                         <div class="note-title">Entrepôt ABC Manufacturing</div>
                         <div class="note-excerpt">
-                            Proposition pour toiture métallique industrielle avec isolation renforcée.
+                            Proposition pour toiture métallique industrielle avec isolation renforcée. Incluant l'évaluation des structures portantes.
                         </div>
                         <div class="note-footer">
-                            <span>02/06/2023</span>
-                            <span><i class="fas fa-tag" style="color: #FF2D55;"></i></span>
+                            <span><i class="fas fa-calendar"></i> 02/06/2023</span>
+                            <span class="status-badge status-approved">Approuvé</span>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Note 4 -->
+                <!-- Soumission 4 -->
                 <div class="note-card">
                     <div class="note-image">
-                        <i class="fas fa-home" style="font-size: 40px;"></i>
+                        <i class="fas fa-home"></i>
                     </div>
                     <div class="note-content">
                         <div class="note-title">Rénovation Tremblay</div>
                         <div class="note-excerpt">
-                            Remplacement complet de la toiture avec bardeaux architecturaux et nouvel éventilation.
+                            Remplacement complet de la toiture avec bardeaux architecturaux et nouvel éventilation. Garantie étendue incluse.
                         </div>
                         <div class="note-footer">
-                            <span>28/05/2023</span>
-                            <span></span>
+                            <span><i class="fas fa-calendar"></i> 28/05/2023</span>
+                            <span class="status-badge status-pending">En attente</span>
                         </div>
                     </div>
                 </div>
@@ -445,6 +533,27 @@
                 this.classList.add('active');
             });
         });
+        
+        // Menu toggle pour mobile
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.getElementById('sidebar');
+        
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+        });
+        
+        // Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                    })
+                    .catch(function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
