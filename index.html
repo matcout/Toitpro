@@ -2,6 +2,8 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8"/>
+<meta name="description" content="Application professionnelle de gestion de soumissions pour les toitures">
+<meta name="author" content="Toit Pro Solutions">
 <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
@@ -108,6 +110,11 @@
       padding: 15px 0;
       border-bottom: 1px solid var(--border);
       cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    .folder-item:hover {
+      background-color: #f8f9fa;
     }
     
     .folder-item:last-child {
@@ -491,6 +498,125 @@
       }
     }
     
+    /* Page des soumissions */
+    .submission-item {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+      padding: 20px;
+      margin-bottom: 15px;
+      transition: transform 0.2s;
+    }
+    
+    .submission-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+    
+    .submission-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .submission-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--secondary);
+    }
+    
+    .submission-date {
+      color: #7f8c8d;
+      font-size: 0.85rem;
+    }
+    
+    .submission-address {
+      color: #34495e;
+      margin-bottom: 10px;
+    }
+    
+    .submission-meta {
+      display: flex;
+      gap: 10px;
+      font-size: 0.9rem;
+      color: #7f8c8d;
+    }
+    
+    .submission-meta span {
+      background: #f1f2f6;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    
+    .submission-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    
+    .btn-action {
+      padding: 8px 15px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.2s;
+    }
+    
+    .btn-view {
+      background: var(--primary);
+      color: white;
+      border: none;
+    }
+    
+    .btn-edit {
+      background: var(--warning);
+      color: white;
+      border: none;
+    }
+    
+    .btn-delete {
+      background: var(--danger);
+      color: white;
+      border: none;
+    }
+    
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #7f8c8d;
+    }
+    
+    .empty-state i {
+      font-size: 3rem;
+      margin-bottom: 15px;
+      color: #b2bec3;
+    }
+    
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+      gap: 10px;
+    }
+    
+    .pagination button {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 6px;
+      background: white;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .pagination button.active {
+      background: var(--primary);
+      color: white;
+    }
+    
     @media (max-width: 768px) {
       .grid-3 {
         grid-template-columns: 1fr 1fr;
@@ -507,6 +633,14 @@
       
       .btn {
         width: 100%;
+      }
+      
+      .submission-actions {
+        flex-direction: column;
+      }
+      
+      .submission-meta {
+        flex-wrap: wrap;
       }
     }
 </style>
@@ -564,10 +698,14 @@
 </div>
 </div>
 </div>
-<!-- Bouton pour créer une nouvelle soumission -->
-<button class="btn btn-save" onclick="showForm()" style="width: 100%;">
+<div class="button-container">
+<button class="btn btn-save" onclick="showForm()">
 <i class="fas fa-plus"></i> Nouvelle soumission
 </button>
+<button class="btn btn-reset" onclick="showSubmissionsPage()">
+<i class="fas fa-list"></i> Mes soumissions
+</button>
+</div>
 </div>
 <!-- Page du formulaire de soumission -->
 <div id="form-page" style="display: none;">
@@ -575,6 +713,7 @@
 <i class="fas fa-arrow-left"></i> Retour aux dossiers
 </button>
 <form id="soumissionForm">
+<input type="hidden" id="submissionId" value="">
 <!-- Section Informations client -->
 <div class="form-section">
 <h2 class="section-title">
@@ -763,13 +902,30 @@
 <!-- Les sous-dossiers seront générés dynamiquement ici -->
 </div>
 </div>
+<!-- Page des soumissions existantes -->
+<div id="submissions-page" style="display: none;">
+<button class="btn btn-back" onclick="backToMain()">
+<i class="fas fa-arrow-left"></i> Retour
+</button>
+<div class="search-container">
+<i class="fas fa-search"></i>
+<input id="submission-search" placeholder="Rechercher une soumission..." type="text"/>
+</div>
+<div class="folder-container">
+<h2 style="margin-bottom: 20px;">Mes soumissions</h2>
+<div id="submissions-list">
+<!-- Les soumissions seront affichées ici dynamiquement -->
+</div>
+<div id="pagination-container" class="pagination"></div>
+</div>
+</div>
 </div>
 <div class="notification" id="notification">
 <i class="fas fa-check-circle"></i>
 <span id="notificationMessage"></span>
 </div>
 
-<!-- AJOUT: Modal pour afficher les photos (élément manquant) -->
+<!-- Modal pour afficher les photos -->
 <div id="photoModal">
   <button class="close-modal" onclick="closeModal()">&times;</button>
   <div id="modalContent"></div>
@@ -779,12 +935,21 @@
     // Base de données unique
     let soumissionsDB = JSON.parse(localStorage.getItem('soumissionsDB')) || [];
     let projectPhotos = JSON.parse(localStorage.getItem('projectPhotos')) || [];
+    let currentSubmissionId = null;
+    let currentPage = 1;
+    const itemsPerPage = 5;
 
     // Initialisation
     document.addEventListener('DOMContentLoaded', function() {
       populateSelects();
       setupSearch();
       loadSavedPhotos();
+      
+      // Configuration de la recherche dans les soumissions
+      const searchInput = document.getElementById('submission-search');
+      searchInput.addEventListener('input', function() {
+        searchSubmissions(this.value);
+      });
       
       // Optimisation mobile: défilement automatique vers le champ actif
       document.querySelectorAll('input, select, textarea').forEach(el => {
@@ -799,7 +964,7 @@
       });
     });
 
-    // Configuration de la recherche
+    // Configuration de la recherche principale
     function setupSearch() {
       const searchInput = document.getElementById('search-input');
       searchInput.addEventListener('input', function() {
@@ -822,6 +987,8 @@
       document.getElementById('main-page').style.display = 'none';
       document.getElementById('form-page').style.display = 'block';
       document.getElementById('year-page').style.display = 'none';
+      document.getElementById('submissions-page').style.display = 'none';
+      resetForm();
     }
     
     // Masquer le formulaire
@@ -829,6 +996,149 @@
       document.getElementById('main-page').style.display = 'block';
       document.getElementById('form-page').style.display = 'none';
       document.getElementById('year-page').style.display = 'none';
+      document.getElementById('submissions-page').style.display = 'none';
+    }
+    
+    // Afficher la page des soumissions
+    function showSubmissionsPage() {
+      document.getElementById('main-page').style.display = 'none';
+      document.getElementById('form-page').style.display = 'none';
+      document.getElementById('year-page').style.display = 'none';
+      document.getElementById('submissions-page').style.display = 'block';
+      loadSubmissions();
+    }
+    
+    // Charger les soumissions
+    function loadSubmissions(page = 1) {
+      currentPage = page;
+      const startIndex = (page - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const paginatedSubmissions = soumissionsDB.slice(startIndex, endIndex);
+      
+      const submissionsList = document.getElementById('submissions-list');
+      const paginationContainer = document.getElementById('pagination-container');
+      
+      if (soumissionsDB.length === 0) {
+        submissionsList.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-folder-open"></i>
+            <h3>Aucune soumission trouvée</h3>
+            <p>Créez votre première soumission pour commencer</p>
+          </div>
+        `;
+        paginationContainer.innerHTML = '';
+        return;
+      }
+      
+      submissionsList.innerHTML = '';
+      
+      paginatedSubmissions.forEach((submission, index) => {
+        const submissionItem = document.createElement('div');
+        submissionItem.className = 'submission-item';
+        submissionItem.innerHTML = `
+          <div class="submission-header">
+            <div class="submission-title">${submission.client.nom}</div>
+            <div class="submission-date">${new Date(submission.date).toLocaleDateString('fr-CA')}</div>
+          </div>
+          <div class="submission-address">${submission.client.adresse}</div>
+          <div class="submission-meta">
+            <span>${submission.toiture.superficie_totale} pi²</span>
+            <span>${submission.materiaux.feuilles} feuilles</span>
+            <span>${submission.photos.length} photos</span>
+          </div>
+          <div class="submission-actions">
+            <button class="btn-action btn-view" onclick="viewSubmission('${submission.id}')">
+              <i class="fas fa-eye"></i> Voir
+            </button>
+            <button class="btn-action btn-edit" onclick="editSubmission('${submission.id}')">
+              <i class="fas fa-edit"></i> Modifier
+            </button>
+            <button class="btn-action btn-delete" onclick="deleteSubmission('${submission.id}')">
+              <i class="fas fa-trash"></i> Supprimer
+            </button>
+          </div>
+        `;
+        submissionsList.appendChild(submissionItem);
+      });
+      
+      // Pagination
+      const totalPages = Math.ceil(soumissionsDB.length / itemsPerPage);
+      paginationContainer.innerHTML = '';
+      
+      if (totalPages > 1) {
+        for (let i = 1; i <= totalPages; i++) {
+          const btn = document.createElement('button');
+          btn.textContent = i;
+          if (i === currentPage) {
+            btn.classList.add('active');
+          }
+          btn.onclick = () => loadSubmissions(i);
+          paginationContainer.appendChild(btn);
+        }
+      }
+    }
+    
+    // Rechercher dans les soumissions
+    function searchSubmissions(term) {
+      term = term.toLowerCase().trim();
+      
+      if (!term) {
+        loadSubmissions();
+        return;
+      }
+      
+      const filtered = soumissionsDB.filter(sub => 
+        sub.client.nom.toLowerCase().includes(term) || 
+        sub.client.adresse.toLowerCase().includes(term) ||
+        sub.client.telephone.includes(term) ||
+        sub.notes.toLowerCase().includes(term)
+      );
+      
+      const submissionsList = document.getElementById('submissions-list');
+      submissionsList.innerHTML = '';
+      
+      if (filtered.length === 0) {
+        submissionsList.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-search"></i>
+            <h3>Aucun résultat trouvé</h3>
+            <p>Essayez avec d'autres termes de recherche</p>
+          </div>
+        `;
+        document.getElementById('pagination-container').innerHTML = '';
+        return;
+      }
+      
+      filtered.forEach(submission => {
+        const submissionItem = document.createElement('div');
+        submissionItem.className = 'submission-item';
+        submissionItem.innerHTML = `
+          <div class="submission-header">
+            <div class="submission-title">${submission.client.nom}</div>
+            <div class="submission-date">${new Date(submission.date).toLocaleDateString('fr-CA')}</div>
+          </div>
+          <div class="submission-address">${submission.client.adresse}</div>
+          <div class="submission-meta">
+            <span>${submission.toiture.superficie_totale} pi²</span>
+            <span>${submission.materiaux.feuilles} feuilles</span>
+            <span>${submission.photos.length} photos</span>
+          </div>
+          <div class="submission-actions">
+            <button class="btn-action btn-view" onclick="viewSubmission('${submission.id}')">
+              <i class="fas fa-eye"></i> Voir
+            </button>
+            <button class="btn-action btn-edit" onclick="editSubmission('${submission.id}')">
+              <i class="fas fa-edit"></i> Modifier
+            </button>
+            <button class="btn-action btn-delete" onclick="deleteSubmission('${submission.id}')">
+              <i class="fas fa-trash"></i> Supprimer
+            </button>
+          </div>
+        `;
+        submissionsList.appendChild(submissionItem);
+      });
+      
+      document.getElementById('pagination-container').innerHTML = '';
     }
     
     // Ouvrir un dossier année
@@ -836,6 +1146,7 @@
       document.getElementById('main-page').style.display = 'none';
       document.getElementById('form-page').style.display = 'none';
       document.getElementById('year-page').style.display = 'block';
+      document.getElementById('submissions-page').style.display = 'none';
       
       const yearFolders = document.getElementById('year-folders');
       yearFolders.innerHTML = `
@@ -903,6 +1214,7 @@
       document.getElementById('main-page').style.display = 'block';
       document.getElementById('form-page').style.display = 'none';
       document.getElementById('year-page').style.display = 'none';
+      document.getElementById('submissions-page').style.display = 'none';
     }
     
     // Remplir les sélecteurs
@@ -966,7 +1278,7 @@
       document.getElementById('superficie').textContent = superficieNet;
     }
     
-    // Fonction pour prendre une photo
+    // Fonction pour prendre une photo (avec optimisation)
     function takePhoto() {
       // Créer un élément input de type file
       const input = document.createElement('input');
@@ -980,18 +1292,20 @@
           const reader = new FileReader();
           
           reader.onload = function(event) {
-            const photoData = {
-              id: 'photo_' + Date.now(),
-              data: event.target.result,
-              date: new Date().toLocaleString(),
-              description: 'Photo du projet'
-            };
-            
-            projectPhotos.push(photoData);
-            updatePhotoGrid();
-            savePhotosToLocalStorage();
-            
-            showNotification('Photo ajoutée avec succès', 'success');
+            compressImage(event.target.result, function(compressedData) {
+              const photoData = {
+                id: 'photo_' + Date.now(),
+                data: compressedData,
+                date: new Date().toLocaleString(),
+                description: 'Photo du projet'
+              };
+              
+              projectPhotos.push(photoData);
+              updatePhotoGrid();
+              savePhotosToLocalStorage();
+              
+              showNotification('Photo ajoutée avec succès', 'success');
+            });
           };
           
           reader.readAsDataURL(file);
@@ -999,6 +1313,46 @@
       };
       
       input.click();
+    }
+    
+    // Compression d'image pour réduire la taille
+    function compressImage(dataUrl, callback) {
+      const img = new Image();
+      img.src = dataUrl;
+      
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Définir les dimensions maximales
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 800;
+        let width = img.width;
+        let height = img.height;
+        
+        // Redimensionner si nécessaire
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height;
+            height = MAX_HEIGHT;
+          }
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Dessiner l'image sur le canvas
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convertir en format JPEG avec qualité 80%
+        const compressedData = canvas.toDataURL('image/jpeg', 0.8);
+        callback(compressedData);
+      };
     }
     
     // Mettre à jour la grille de photos
@@ -1103,7 +1457,8 @@
       projectPhotos = [];
       updatePhotoGrid();
       localStorage.removeItem('projectPhotos');
-      showNotification('Formulaire réinitialisé avec succès', 'success');
+      currentSubmissionId = null;
+      document.getElementById('submissionId').value = '';
     }
     
     // Notifications
@@ -1135,8 +1490,9 @@
         return;
       }
       
+      const soumissionId = document.getElementById('submissionId').value;
       const soumission = {
-        id: 'soum_' + Date.now(),
+        id: soumissionId || 'soum_' + Date.now(),
         date: new Date().toISOString(),
         annee: new Date().getFullYear(),
         type: 'Soumission',
@@ -1182,8 +1538,19 @@
         photos: projectPhotos
       };
       
+      // Mise à jour ou ajout
+      if (soumissionId) {
+        const index = soumissionsDB.findIndex(s => s.id === soumissionId);
+        if (index !== -1) {
+          soumissionsDB[index] = soumission;
+          showNotification('Soumission mise à jour avec succès', 'success');
+        }
+      } else {
+        soumissionsDB.push(soumission);
+        showNotification('Nouvelle soumission enregistrée', 'success');
+      }
+      
       // Sauvegarder dans la base de données
-      soumissionsDB.push(soumission);
       localStorage.setItem('soumissionsDB', JSON.stringify(soumissionsDB));
       
       // Télécharger le fichier JSON
@@ -1199,9 +1566,86 @@
       linkElement.click();
       document.body.removeChild(linkElement);
       
-      showNotification(`Soumission enregistrée pour ${soumission.client.nom}`, 'success');
       resetForm();
       hideForm();
+      showSubmissionsPage();
+    }
+    
+    // Visualiser une soumission
+    function viewSubmission(id) {
+      const submission = soumissionsDB.find(s => s.id === id);
+      if (!submission) return;
+      
+      // Afficher les détails dans un modal (simplifié pour l'exemple)
+      alert(`Soumission de ${submission.client.nom}\nAdresse: ${submission.client.adresse}\nSuperficie: ${submission.toiture.superficie_totale} pi²`);
+    }
+    
+    // Modifier une soumission
+    function editSubmission(id) {
+      const submission = soumissionsDB.find(s => s.id === id);
+      if (!submission) return;
+      
+      // Remplir le formulaire
+      document.getElementById('submissionId').value = submission.id;
+      document.getElementById('nom').value = submission.client.nom;
+      document.getElementById('adresse').value = submission.client.adresse;
+      document.getElementById('telephone').value = submission.client.telephone;
+      document.getElementById('courriel').value = submission.client.courriel;
+      
+      // Dimensions
+      document.getElementById('dimension1').value = submission.toiture.dimensions[0].valeur;
+      document.getElementById('dimension2').value = submission.toiture.dimensions[1].valeur;
+      document.getElementById('dimension3').value = submission.toiture.dimensions[2].valeur;
+      document.getElementById('dimension4').value = submission.toiture.dimensions[3].valeur;
+      
+      // Matériaux
+      document.getElementById('nbFeuilles').value = submission.materiaux.feuilles;
+      document.getElementById('nbMax').value = submission.materiaux.max;
+      document.getElementById('nbEvents').value = submission.materiaux.events;
+      document.getElementById('nbDrains').value = submission.materiaux.drains;
+      document.getElementById('trepiedElectrique').value = submission.materiaux.trepied_electrique;
+      document.getElementById('ff180').value = submission.materiaux.ff180;
+      document.getElementById('armorbound180').value = submission.materiaux.armorbound180;
+      
+      // Puits de lumière
+      document.getElementById('puitLumiere1Dim1').value = submission.materiaux.puit_lumiere_1.dim1;
+      document.getElementById('puitLumiere1Dim2').value = submission.materiaux.puit_lumiere_1.dim2;
+      document.getElementById('puitLumiere2Dim1').value = submission.materiaux.puit_lumiere_2.dim1;
+      document.getElementById('puitLumiere2Dim2').value = submission.materiaux.puit_lumiere_2.dim2;
+      
+      // Options
+      document.getElementById('plusieursEpaisseurs').checked = submission.toiture.plusieurs_epaisseurs;
+      document.getElementById('hydroQuebec').checked = submission.options.hydro_quebec;
+      document.getElementById('grue').checked = submission.options.grue;
+      document.getElementById('trackfall').checked = submission.options.trackfall;
+      
+      // Notes
+      document.getElementById('notes').value = submission.notes;
+      
+      // Photos
+      projectPhotos = submission.photos;
+      updatePhotoGrid();
+      
+      // Calculer la superficie
+      calculerSuperficie();
+      
+      // Afficher le formulaire
+      document.getElementById('main-page').style.display = 'none';
+      document.getElementById('form-page').style.display = 'block';
+      document.getElementById('year-page').style.display = 'none';
+      document.getElementById('submissions-page').style.display = 'none';
+      
+      showNotification('Soumission chargée pour modification', 'success');
+    }
+    
+    // Supprimer une soumission
+    function deleteSubmission(id) {
+      if (confirm('Êtes-vous sûr de vouloir supprimer cette soumission ? Cette action est irréversible.')) {
+        soumissionsDB = soumissionsDB.filter(s => s.id !== id);
+        localStorage.setItem('soumissionsDB', JSON.stringify(soumissionsDB));
+        showNotification('Soumission supprimée', 'success');
+        loadSubmissions(currentPage);
+      }
     }
     
     // Service Worker
