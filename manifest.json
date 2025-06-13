@@ -1,11 +1,11 @@
 {
   "name": "Toit Pro",
   "short_name": "ToitPro",
-  "start_url": "./",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#f0f2f5",
-  "theme_color": "#3498db",
-  "orientation": "portrait",
+  "theme_color": "#2DBE60",
+  "description": "Application de gestion des soumissions pour entrepreneurs en toiture",
   "icons": [
     {
       "src": "icons/icon-192.png",
