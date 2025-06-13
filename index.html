@@ -395,9 +395,23 @@
       margin-bottom: 20px;
     }
     
+    /* CORRECTION: Bouton Nouveau dossier bien visible */
     .btn-new-folder {
       background: var(--primary);
       color: white;
+      box-shadow: 0 4px 6px rgba(52, 152, 219, 0.3);
+      animation: pulse 2s infinite;
+    }
+    
+    .btn-new-folder:hover, .btn-new-folder:active {
+      background: #2980b9;
+      transform: translateY(-2px);
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.4); }
+      70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
     }
     
     /* Styles pour les photos */
@@ -779,6 +793,7 @@
 <button class="btn btn-reset" onclick="showSubmissionsPage()">
 <i class="fas fa-list"></i> Mes soumissions
 </button>
+<!-- CORRECTION: Bouton Nouveau dossier bien placé et visible -->
 <button class="btn btn-new-folder" onclick="showDossierModal()">
 <i class="fas fa-folder-plus"></i> Nouveau dossier
 </button>
@@ -880,18 +895,6 @@
       const searchInput = document.getElementById('submission-search');
       searchInput.addEventListener('input', function() {
         searchSubmissions(this.value);
-      });
-      
-      // Optimisation mobile: défilement automatique vers le champ actif
-      document.querySelectorAll('input, select, textarea').forEach(el => {
-        el.addEventListener('focus', () => {
-          setTimeout(() => {
-            window.scrollTo({
-              top: el.getBoundingClientRect().top + window.pageYOffset - 100,
-              behavior: 'smooth'
-            });
-          }, 100);
-        });
       });
     });
 
@@ -995,8 +998,6 @@
         showNotification(`Dossier "${dossier.nom}" supprimé`, 'success');
       }
     }
-    
-    // ... autres fonctions existantes (setupSearch, showForm, etc.) ...
     
     // Configuration de la recherche principale
     function setupSearch() {
@@ -1251,7 +1252,66 @@
       document.getElementById('submissions-page').style.display = 'none';
     }
     
-    // ... autres fonctions existantes (populateSelects, calculerSuperficie, etc.) ...
+    // Remplir les sélecteurs
+    function populateSelects() {
+      // Dimensions principales et puit de lumière (0 à 200)
+      const dimensionSelects = document.querySelectorAll(`
+        select[id^="dimension"], 
+        #puitLumiere1Dim1, #puitLumiere1Dim2,
+        #puitLumiere2Dim1, #puitLumiere2Dim2
+      `);
+      
+      dimensionSelects.forEach(select => {
+        // Conserver l'option par défaut
+        const defaultOption = select.options[0];
+        select.innerHTML = '';
+        select.appendChild(defaultOption);
+        
+        // Ajouter les options de 1 à 200
+        for (let i = 1; i <= 200; i++) {
+          const option = document.createElement('option');
+          option.value = i;
+          option.textContent = i;
+          select.appendChild(option);
+        }
+      });
+      
+      // Autres sélecteurs (0 à 50)
+      const smallSelects = [
+        'nbFeuilles', 'nbMax', 'nbEvents', 'nbDrains',
+        'trepiedElectrique', 'ff180', 'armorbound180'
+      ];
+      
+      smallSelects.forEach(id => {
+        const select = document.getElementById(id);
+        for (let i = 0; i <= 50; i++) {
+          const option = document.createElement('option');
+          option.value = i;
+          option.textContent = i;
+          select.appendChild(option);
+        }
+      });
+    }
+    
+    // Calcul de la superficie avec déduction des puits de lumière
+    function calculerSuperficie() {
+      const dim1 = parseFloat(document.getElementById('dimension1').value) || 0;
+      const dim2 = parseFloat(document.getElementById('dimension2').value) || 0;
+      const dim3 = parseFloat(document.getElementById('dimension3').value) || 0;
+      const dim4 = parseFloat(document.getElementById('dimension4').value) || 0;
+      
+      // Calcul des puits de lumière
+      const pl1Dim1 = parseFloat(document.getElementById('puitLumiere1Dim1').value) || 0;
+      const pl1Dim2 = parseFloat(document.getElementById('puitLumiere1Dim2').value) || 0;
+      const pl2Dim1 = parseFloat(document.getElementById('puitLumiere2Dim1').value) || 0;
+      const pl2Dim2 = parseFloat(document.getElementById('puitLumiere2Dim2').value) || 0;
+      
+      const superficieTotale = (dim1 * dim2) + (dim3 * dim4);
+      const superficiePuitsLumiere = (pl1Dim1 * pl1Dim2) + (pl2Dim1 * pl2Dim2);
+      
+      const superficieNet = Math.max(0, superficieTotale - superficiePuitsLumiere);
+      document.getElementById('superficie').textContent = superficieNet;
+    }
     
     // Fonction pour prendre une photo (avec optimisation)
     function takePhoto() {
