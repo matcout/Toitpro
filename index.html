@@ -874,18 +874,210 @@
                 submissions = appData.submissions.filter(sub => sub.folderId === appData.currentFolder);
             }
             
-            contentArea.innerHTML = `
-                <div class="notes-header">
-                    <h2 class="notes-title">${title}</h2>
-                    <button class="new-note-btn" id="newSubmissionBtn">
-                        <i class="fas fa-plus"></i>
-                        Nouvelle soumission
-                    </button>
+            contentArea.innerHTML = `<div class="form-container">
+      <form id="soumissionForm">
+        <!-- Section Informations client -->
+        <div class="form-section">
+          <h2 class="section-title">
+            <i class="fas fa-user"></i>
+            Informations client
+          </h2>
+          
+          <label for="nom" class="required">Nom du client :</label>
+          <input type="text" id="nom" name="nom" required placeholder="Nom complet">
+          
+          <label for="adresse" class="required">Adresse des travaux :</label>
+          <input type="text" id="adresse" name="adresse" required placeholder="Adresse complète">
+          
+          <div class="grid-2">
+            <div>
+              <label for="telephone" class="required">Téléphone :</label>
+              <input type="tel" id="telephone" name="telephone" required placeholder="(123) 456-7890">
+            </div>
+            <div>
+              <label for="courriel" class="required">Courriel :</label>
+              <input type="email" id="courriel" name="courriel" required placeholder="email@exemple.com">
+            </div>
+          </div>
+        </div>
+        
+        <!-- Section Dimensions -->
+        <div class="form-section">
+          <h2 class="section-title">
+            <i class="fas fa-ruler-combined"></i>
+            Dimensions de la toiture
+          </h2>
+          
+          <div class="dimensions-row">
+            <select id="dimension1" name="dimension1" onchange="calculerSuperficie()">
+              <option value="0">Longueur 1</option>
+            </select>
+            <span>×</span>
+            <select id="dimension2" name="dimension2" onchange="calculerSuperficie()">
+              <option value="0">Largeur 1</option>
+            </select>
+          </div>
+          
+          <div class="dimensions-row">
+            <select id="dimension3" name="dimension3" onchange="calculerSuperficie()">
+              <option value="0">Longueur 2</option>
+            </select>
+            <span>×</span>
+            <select id="dimension4" name="dimension4" onchange="calculerSuperficie()">
+              <option value="0">Largeur 2</option>
+            </select>
+          </div>
+          
+          <div class="superficie-container">
+            <label>Superficie totale :</label>
+            <output id="superficie">0</output>
+          </div>
+          <div class="form-note">Saisissez les dimensions de chaque section de toiture en pieds</div>
+        </div>
+        
+        <!-- Section Matériaux -->
+        <div class="form-section">
+          <h2 class="section-title">
+            <i class="fas fa-tools"></i>
+            Matériaux et accessoires
+          </h2>
+          
+          <div class="grid-3">
+            <div>
+              <label for="nbFeuilles">Feuilles de tôles</label>
+              <select id="nbFeuilles" name="nbFeuilles"></select>
+            </div>
+            <div>
+              <label for="nbMax">Maximum</label>
+              <select id="nbMax" name="nbMax"></select>
+            </div>
+            <div>
+              <label for="nbEvents">Évents</label>
+              <select id="nbEvents" name="nbEvents"></select>
+            </div>
+            <div>
+              <label for="nbDrains">Drains</label>
+              <select id="nbDrains" name="nbDrains"></select>
+            </div>
+            <div>
+              <label for="trepiedElectrique">Trépied électrique</label>
+              <select id="trepiedElectrique" name="trepiedElectrique"></select>
+            </div>
+            <div>
+              <label for="ff180">180FF</label>
+              <select id="ff180" name="ff180"></select>
+            </div>
+            <div>
+              <label for="armorbound180">Armorbound 180</label>
+              <select id="armorbound180" name="armorbound180"></select>
+            </div>
+          </div>
+          
+          <!-- Section Puit de lumière 1 -->
+          <div class="puit-lumiere-container">
+            <label>Puit de lumière 1</label>
+            <div class="puit-lumiere-row">
+              <select id="puitLumiere1Dim1" name="puitLumiere1Dim1" onchange="calculerSuperficie()">
+                <option value="0">Longueur</option>
+              </select>
+              <span>×</span>
+              <select id="puitLumiere1Dim2" name="puitLumiere1Dim2" onchange="calculerSuperficie()">
+                <option value="0">Largeur</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- Section Puit de lumière 2 -->
+          <div class="puit-lumiere-container" style="margin-top: 15px;">
+            <label>Puit de lumière 2</label>
+            <div class="puit-lumiere-row">
+              <select id="puitLumiere2Dim1" name="puitLumiere2Dim1" onchange="calculerSuperficie()">
+                <option value="0">Longueur</option>
+              </select>
+              <span>×</span>
+              <select id="puitLumiere2Dim2" name="puitLumiere2Dim2" onchange="calculerSuperficie()">
+                <option value="0">Largeur</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-note">Les puits de lumière seront déduits de la superficie totale</div>
+        </div>
+        
+        <!-- Section Photos -->
+        <div class="form-section">
+          <h2 class="section-title">
+            <i class="fas fa-camera"></i>
+            Photos du projet
+          </h2>
+          
+          <div class="photos-container">
+            <p>Prenez des photos de la toiture pour documenter votre projet</p>
+            
+            <div class="photos-grid">
+              <!-- Les photos seront ajoutées ici dynamiquement -->
+              <div class="photo-item">
+                <div class="photo-placeholder" onclick="takePhoto()">
+                  <i class="fas fa-plus-circle"></i>
+                  <span>Ajouter</span>
                 </div>
-                
-                <div class="notes-grid" id="submissionsGrid">
-                    <!-- Les soumissions seront ajoutées ici -->
-                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Section Autres -->
+        <div class="form-section">
+          <h2 class="section-title">
+            <i class="fas fa-cogs"></i>
+            Autres options
+          </h2>
+          
+          <div class="checkbox-container">
+            <div class="checkbox-item">
+              <input type="checkbox" id="plusieursEpaisseurs" name="plusieursEpaisseurs">
+              <label for="plusieursEpaisseurs">Plusieurs épaisseurs de toiture</label>
+            </div>
+            
+            <div class="checkbox-item">
+              <input type="checkbox" id="hydroQuebec" name="hydroQuebec">
+              <label for="hydroQuebec">Travaux Hydro Québec requis</label>
+            </div>
+            
+            <div class="checkbox-item">
+              <input type="checkbox" id="grue" name="grue">
+              <label for="grue">Grue nécessaire</label>
+            </div>
+            
+            <div class="checkbox-item">
+              <input type="checkbox" id="trackfall" name="trackfall">
+              <label for="trackfall">Trackfall et chute</label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Notes supplémentaires -->
+        <div class="form-section">
+          <h2 class="section-title">
+            <i class="fas fa-sticky-note"></i>
+            Notes supplémentaires
+          </h2>
+          <label for="notes">Détails, observations ou instructions spéciales :</label>
+          <textarea id="notes" name="notes" placeholder="Décrivez ici toute information supplémentaire importante..."></textarea>
+        </div>
+        
+        <!-- Boutons -->
+        <div class="button-container">
+          <button type="button" class="btn btn-save" onclick="enregistrerSoumission()">
+            <i class="fas fa-save"></i> Enregistrer la soumission
+          </button>
+          <button type="button" class="btn btn-reset" onclick="resetForm()">
+            <i class="fas fa-redo"></i> Réinitialiser
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
             `;
             
             renderSubmissionsGrid(submissions, 'submissionsGrid');
