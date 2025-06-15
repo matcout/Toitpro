@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toit Pro - Gestion de projets</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2DBE60;
+            --secondary: #2D3848;
+            --sidebar: #F7F7F7;
+            --header: #FFFFFF;
+            --text: #333333;
+            --text-light: #777777;
+            --border: #E0E0E0;
+            --hover: #F5F5F5;
+            --active: #E3F2E8;
+            --card-bg: #FFFFFF;
+            --danger: #e74c3c;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            height: 100vh;
+            color: var(--text);
+            background: #f0f2f5;
+        }
+        
+        /* Sidebar style */
+        .sidebar {
+            width: 280px;
+            background: var(--sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s;
+            z-index: 100;
+        }
+        
+        .logo-container {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo i {
+            font-size: 24px;
+        }
+        
+        .nav-menu {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px 0;
+        }
+        
+        .nav-section {
+            margin-bottom: 20px;
+        }
+        
+        .nav-title {
+            padding: 5px 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .add-folder-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            margin: 2px 0;
+            cursor: pointer;
+            border-radius: 0 5px 5px 0;
+            transition: all 0.2s;
+            position: relative;
+        }
+        
+        .nav-item:hover {
+            background: var(--hover);
+        }
+        
+        .nav-item.active {
+            background: var(--active);
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .nav-item i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+            font-size: 18px;
+        }
+        
+        .folder-actions {
+            position: absolute;
+            right: 15px;
+            display: none;
+        }
+        
+        .nav-item:hover .folder-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .folder-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .folder-action-btn:hover {
+            color: var(--danger);
+        }
+        
+        /* Main content */
+        .main-content {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .header {
+            height: 60px;
+            background: var(--header);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            gap: 15px;
+        }
+        
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text);
+        }
+        
+        .search-bar {
+            flex-grow: 1;
+            max-width: 600px;
+            position: relative;
+        }
+        
+        .search-bar input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .search-bar i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+        
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .content-area {
+            flex-grow: 1;
+            overflow: auto;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+        
+        /* Notes list style */
+        .notes-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .notes-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .new-note-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        
+        .new-note-btn:hover {
+            background: #25a955;
+            transform: translateY(-2px);
+        }
+        
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .note-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.2s;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .note-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateY(-3px);
+        }
+        
+        .note-image {
+            height: 160px;
+            background: linear-gradient(135deg, #f5f7fa, #e4e7eb);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 40px;
+        }
+        
+        .note-content {
+            padding: 15px;
+        }
+        
+        .note-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 18px;
+        }
+        
+        .note-excerpt {
+            font-size: 14px;
+            color: var(--text-light);
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+        
+        .note-footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--text-light);
+            border-top: 1px solid var(--border);
+            padding-top: 10px;
+        }
+        
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #fef9e7;
+            color: #d4ac0d;
+        }
+        
+        .status-approved {
+            background: #e8f8f0;
+            color: #28b463;
+        }
+        
+        /* Formulaire de soumission */
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 25px;
+        }
+        
+        .form-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .form-title {
+            font-size: 22px;
+            color: var(--secondary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            flex: 1;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--secondary);
+        }
+        
+        .form-group input, 
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .dimensions-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .superficie-result {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #25a955;
+        }
+        
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                position: fixed;
+                left: -280px;
+                height: 100vh;
+                z-index: 100;
+                background: white;
+                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            }
+            
+            .sidebar.active {
+                left: 0;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .notes-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .dimensions-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .notes-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 0 15px;
+            }
+            
+            .user-menu {
+                gap: 10px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .dimensions-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-light);
+        }
+        
+        .empty-state i {
+            font-size: 60px;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+        }
+        
+        .empty-state h3 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: var(--text);
+        }
+        
+        .empty-state p {
+            max-width: 500px;
+            margin: 0 auto 20px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-light);
+        }
+        
+        .modal-body {
+            margin-bottom: 25px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="logo-container">
+            <div class="logo">
+                <i class="fas fa-home"></i>
+                <span>Toit Pro</span>
+            </div>
+        </div>
+        
+        <div class="nav-menu">
+            <div class="nav-section">
+                <div class="nav-title">Menu</div>
+                <div class="nav-item active" data-page="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>Tableau de bord</span>
+                </div>
+                <div class="nav-item" data-page="submissions">
+                    <i class="fas fa-file-alt"></i>
+                    <span>Soumissions</span>
+                </div>
+            </div>
+            
+            <div class="nav-section">
+                <div class="nav-title">
+                    <span>Mes dossiers</span>
+                    <button class="add-folder-btn" id="addFolderBtn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+                <div id="foldersContainer">
+                    <!-- Les dossiers seront ajoutés dynamiquement ici -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main content -->
+    <div class="main-content">
+        <div class="header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            
+            <div class="search-bar">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Rechercher un projet...">
+            </div>
+            
+            <div class="user-menu">
+                <div style="width: 32px; height: 32px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;">
+                    MP
+                </div>
+            </div>
+        </div>
+        
+        <div class="content-area" id="contentArea">
+            <!-- Le contenu dynamique sera affiché ici -->
+        </div>
+    </div>
+
+    <!-- Modal pour créer un dossier -->
+    <div class="modal" id="folderModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Nouveau dossier</h3>
+                <button class="close-modal" id="closeFolderModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="folderName">Nom du dossier</label>
+                    <input type="text" id="folderName" placeholder="Ex: Projets résidentiels">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="cancelFolderBtn">Annuler</button>
+                <button class="btn btn-primary" id="saveFolderBtn">Créer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Données de l'application
+        const appData = {
+            folders: JSON.parse(localStorage.getItem('folders')) || [
+                { id: 1, name: "Projets commerciaux" },
+                { id: 2, name: "Projets résidentiels" }
+            ],
+            submissions: JSON.parse(localStorage.getItem('submissions')) || [],
+            currentFolder: null,
+            currentPage: 'dashboard'
+        };
+
+        // Éléments DOM
+        const sidebar = document.getElementById('sidebar');
+        const menuToggle = document.getElementById('menuToggle');
+        const foldersContainer = document.getElementById('foldersContainer');
+        const contentArea = document.getElementById('contentArea');
+        const addFolderBtn = document.getElementById('addFolderBtn');
+        const folderModal = document.getElementById('folderModal');
+        const closeFolderModal = document.getElementById('closeFolderModal');
+        const cancelFolderBtn = document.getElementById('cancelFolderBtn');
+        const saveFolderBtn = document.getElementById('saveFolderBtn');
+        const folderNameInput = document.getElementById('folderName');
+        const navItems = document.querySelectorAll('.nav-item');
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            renderFolders();
+            renderDashboard();
+            setupEventListeners();
+        });
+
+        // Configuration des écouteurs d'événements
+        function setupEventListeners() {
+            // Menu toggle
+            menuToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('active');
+            });
+
+            // Navigation
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    // Mettre à jour la classe active
+                    navItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Changer de page
+                    const page = this.getAttribute('data-page');
+                    appData.currentPage = page;
+                    
+                    if (page === 'dashboard') {
+                        renderDashboard();
+                    } else if (page === 'submissions') {
+                        renderSubmissions();
+                    }
+                });
+            });
+
+            // Gestion des dossiers
+            addFolderBtn.addEventListener('click', openFolderModal);
+            closeFolderModal.addEventListener('click', closeFolderModalHandler);
+            cancelFolderBtn.addEventListener('click', closeFolderModalHandler);
+            saveFolderBtn.addEventListener('click', saveFolder);
+
+            // Fermer le modal en cliquant en dehors
+            window.addEventListener('click', function(event) {
+                if (event.target === folderModal) {
+                    closeFolderModalHandler();
+                }
+            });
+        }
+
+        // Rendu des dossiers dans la sidebar
+        function renderFolders() {
+            foldersContainer.innerHTML = '';
+            
+            if (appData.folders.length === 0) {
+                foldersContainer.innerHTML = '<p style="padding: 10px 20px; color: var(--text-light);">Aucun dossier</p>';
+                return;
+            }
+            
+            appData.folders.forEach(folder => {
+                const folderElement = document.createElement('div');
+                folderElement.className = 'nav-item';
+                folderElement.setAttribute('data-folder', folder.id);
+                folderElement.innerHTML = `
+                    <i class="fas fa-folder"></i>
+                    <span>${folder.name}</span>
+                    <div class="folder-actions">
+                        <button class="folder-action-btn delete-folder" data-id="${folder.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                folderElement.addEventListener('click', function(e) {
+                    if (!e.target.closest('.folder-action-btn')) {
+                        // Charger les soumissions de ce dossier
+                        appData.currentFolder = folder.id;
+                        renderSubmissions();
+                        
+                        // Mettre à jour la navigation
+                        navItems.forEach(item => item.classList.remove('active'));
+                        document.querySelector('.nav-item[data-page="submissions"]').classList.add('active');
+                        appData.currentPage = 'submissions';
+                    }
+                });
+                
+                foldersContainer.appendChild(folderElement);
+            });
+            
+            // Ajouter les écouteurs d'événements pour les boutons de suppression
+            document.querySelectorAll('.delete-folder').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const folderId = parseInt(this.getAttribute('data-id'));
+                    deleteFolder(folderId);
+                });
+            });
+        }
+
+        // Supprimer un dossier
+        function deleteFolder(folderId) {
+            if (confirm("Êtes-vous sûr de vouloir supprimer ce dossier ? Toutes les soumissions qu'il contient seront également supprimées.")) {
+                // Supprimer le dossier
+                appData.folders = appData.folders.filter(folder => folder.id !== folderId);
+                
+                // Supprimer les soumissions associées
+                appData.submissions = appData.submissions.filter(sub => sub.folderId !== folderId);
+                
+                // Sauvegarder
+                saveData();
+                
+                // Re-rendre
+                renderFolders();
+                
+                // Si on était dans ce dossier, revenir au tableau de bord
+                if (appData.currentFolder === folderId) {
+                    appData.currentFolder = null;
+                    renderDashboard();
+                    navItems.forEach(item => item.classList.remove('active'));
+                    document.querySelector('.nav-item[data-page="dashboard"]').classList.add('active');
+                    appData.currentPage = 'dashboard';
+                }
+            }
+        }
+
+        // Ouvrir le modal pour créer un dossier
+        function openFolderModal() {
+            folderNameInput.value = '';
+            folderModal.style.display = 'flex';
+            folderNameInput.focus();
+        }
+
+        // Fermer le modal
+        function closeFolderModalHandler() {
+            folderModal.style.display = 'none';
+        }
+
+        // Sauvegarder un nouveau dossier
+        function saveFolder() {
+            const folderName = folderNameInput.value.trim();
+            
+            if (!folderName) {
+                alert('Veuillez entrer un nom pour le dossier');
+                return;
+            }
+            
+            // Créer un nouvel ID
+            const newId = appData.folders.length > 0 
+                ? Math.max(...appData.folders.map(f => f.id)) + 1 
+                : 1;
+            
+            // Ajouter le dossier
+            appData.folders.push({
+                id: newId,
+                name: folderName
+            });
+            
+            // Sauvegarder
+            saveData();
+            
+            // Re-rendre
+            renderFolders();
+            
+            // Fermer le modal
+            closeFolderModalHandler();
+        }
+
+        // Sauvegarder les données dans localStorage
+        function saveData() {
+            localStorage.setItem('folders', JSON.stringify(appData.folders));
+            localStorage.setItem('submissions', JSON.stringify(appData.submissions));
+        }
+
+        // Rendu du tableau de bord
+        function renderDashboard() {
+            contentArea.innerHTML = `
+                <div class="notes-header">
+                    <h2 class="notes-title">Tableau de bord</h2>
+                    <button class="new-note-btn" id="newSubmissionBtn">
+                        <i class="fas fa-plus"></i>
+                        Nouvelle soumission
+                    </button>
+                </div>
+                
+                <div class="notes-grid" id="submissionsGrid">
+                    <!-- Les soumissions récentes seront ajoutées ici -->
+                </div>
+            `;
+            
+            // Afficher les soumissions récentes (les 4 plus récentes)
+            const recentSubmissions = [...appData.submissions]
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 4);
+            
+            renderSubmissionsGrid(recentSubmissions, 'submissionsGrid');
+            
+            // Ajouter l'écouteur pour le bouton "Nouvelle soumission"
+            document.getElementById('newSubmissionBtn').addEventListener('click', renderSubmissionForm);
+        }
+
+        // Rendu de la page des soumissions
+        function renderSubmissions() {
+            let title = "Toutes les soumissions";
+            let submissions = appData.submissions;
+            
+            if (appData.currentFolder) {
+                const folder = appData.folders.find(f => f.id === appData.currentFolder);
+                title = folder ? folder.name : "Soumissions";
+                submissions = appData.submissions.filter(sub => sub.folderId === appData.currentFolder);
+            }
+            
+            contentArea.innerHTML = `
+                <div class="notes-header">
+                    <h2 class="notes-title">${title}</h2>
+                    <button class="new-note-btn" id="newSubmissionBtn">
+                        <i class="fas fa-plus"></i>
+                        Nouvelle soumission
+                    </button>
+                </div>
+                
+                <div class="notes-grid" id="submissionsGrid">
+                    <!-- Les soumissions seront ajoutées ici -->
+                </div>
+            `;
+            
+            renderSubmissionsGrid(submissions, 'submissionsGrid');
+            
+            // Ajouter l'écouteur pour le bouton "Nouvelle soumission"
+            document.getElementById('newSubmissionBtn').addEventListener('click', renderSubmissionForm);
+        }
+
+        // Rendu de la grille de soumissions
+        function renderSubmissionsGrid(submissions, containerId) {
+            const container = document.getElementById(containerId);
+            
+            if (submissions.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-folder-open"></i>
+                        <h3>Aucune soumission</h3>
+                        <p>Créez votre première soumission pour commencer</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = '';
+            
+            submissions.forEach(sub => {
+                const folder = appData.folders.find(f => f.id === sub.folderId);
+                
+                const card = document.createElement('div');
+                card.className = 'note-card';
+                card.innerHTML = `
+                    <div class="note-image">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="note-content">
+                        <div class="note-title">${sub.clientName}</div>
+                        <div class="note-excerpt">
+                            ${sub.address}
+                        </div>
+                        <div class="note-footer">
+                            <span><i class="fas fa-calendar"></i> ${new Date(sub.date).toLocaleDateString()}</span>
+                            <span>${sub.superficie} pi²</span>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+
+        // Rendu du formulaire de soumission
+        function renderSubmissionForm() {
+            contentArea.innerHTML = `
+                <div class="form-container">
+                    <div class="form-title">
+                        <i class="fas fa-file-alt"></i>
+                        Nouvelle soumission
+                    </div>
+                    
+                    <form id="submissionForm">
+                        <div class="form-section">
+                            <h3><i class="fas fa-user"></i> Informations client</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="clientName">Nom du client</label>
+                                    <input type="text" id="clientName" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="clientPhone">Téléphone</label>
+                                    <input type="tel" id="clientPhone" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="clientAddress">Adresse</label>
+                                <input type="text" id="clientAddress" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h3><i class="fas fa-ruler-combined"></i> Dimensions de la toiture</h3>
+                            <div class="dimensions-container">
+                                <div class="form-group">
+                                    <label for="dimension1">Longueur 1 (pi)</label>
+                                    <input type="number" id="dimension1" value="0" min="0" step="0.1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="dimension2">Largeur 1 (pi)</label>
+                                    <input type="number" id="dimension2" value="0" min="0" step="0.1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="dimension3">Longueur 2 (pi)</label>
+                                    <input type="number" id="dimension3" value="0" min="0" step="0.1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="dimension4">Largeur 2 (pi)</label>
+                                    <input type="number" id="dimension4" value="0" min="0" step="0.1">
+                                </div>
+                            </div>
+                            <div class="superficie-result" id="superficieResult">Superficie totale: 0 pi²</div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h3><i class="fas fa-tools"></i> Matériaux et options</h3>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="materialType">Type de matériau</label>
+                                    <select id="materialType">
+                                        <option>Bardeaux d'asphalte</option>
+                                        <option>Tôle métallique</option>
+                                        <option>Tuiles d'argile</option>
+                                        <option>Bardeaux de bois</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="puitLumiere">Puits de lumière</label>
+                                    <select id="puitLumiere">
+                                        <option>Aucun</option>
+                                        <option>1</option>
+                                        <option>2</option>
+                                        <option>3</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-section">
+                            <h3><i class="fas fa-sticky-note"></i> Notes supplémentaires</h3>
+                            <div class="form-group">
+                                <textarea id="notes" placeholder="Ajoutez des notes ou des détails importants..."></textarea>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" id="cancelSubmission">Annuler</button>
+                            <button type="submit" class="btn btn-primary">Enregistrer</button>
+                        </div>
+                    </form>
+                </div>
+            `;
+            
+            // Ajouter les écouteurs d'événements pour le calcul de superficie
+            const dimensionInputs = [
+                document.getElementById('dimension1'),
+                document.getElementById('dimension2'),
+                document.getElementById('dimension3'),
+                document.getElementById('dimension4')
+            ];
+            
+            dimensionInputs.forEach(input => {
+                input.addEventListener('input', calculateSuperficie);
+            });
+            
+            // Calcul initial
+            calculateSuperficie();
+            
+            // Annuler la soumission
+            document.getElementById('cancelSubmission').addEventListener('click', function() {
+                if (appData.currentPage === 'dashboard') {
+                    renderDashboard();
+                } else {
+                    renderSubmissions();
+                }
+            });
+            
+            // Soumettre le formulaire
+            document.getElementById('submissionForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveSubmission();
+            });
+        }
+
+        // Calcul de la superficie
+        function calculateSuperficie() {
+            const dim1 = parseFloat(document.getElementById('dimension1').value) || 0;
+            const dim2 = parseFloat(document.getElementById('dimension2').value) || 0;
+            const dim3 = parseFloat(document.getElementById('dimension3').value) || 0;
+            const dim4 = parseFloat(document.getElementById('dimension4').value) || 0;
+            
+            const superficie = (dim1 * dim2) + (dim3 * dim4);
+            document.getElementById('superficieResult').textContent = `Superficie totale: ${superficie.toFixed(2)} pi²`;
+        }
+
+        // Sauvegarder une soumission
+        function saveSubmission() {
+            const clientName = document.getElementById('clientName').value;
+            const clientPhone = document.getElementById('clientPhone').value;
+            const clientAddress = document.getElementById('clientAddress').value;
+            
+            if (!clientName || !clientPhone || !clientAddress) {
+                alert('Veuillez remplir toutes les informations client');
+                return;
+            }
+            
+            // Créer un nouvel ID
+            const newId = appData.submissions.length > 0 
+                ? Math.max(...appData.submissions.map(s => s.id)) + 1 
+                : 1;
+            
+            // Calculer la superficie
+            const dim1 = parseFloat(document.getElementById('dimension1').value) || 0;
+            const dim2 = parseFloat(document.getElementById('dimension2').value) || 0;
+            const dim3 = parseFloat(document.getElementById('dimension3').value) || 0;
+            const dim4 = parseFloat(document.getElementById('dimension4').value) || 0;
+            const superficie = (dim1 * dim2) + (dim3 * dim4);
+            
+            // Créer la soumission
+            const submission = {
+                id: newId,
+                date: new Date().toISOString(),
+                clientName: clientName,
+                phone: clientPhone,
+                address: clientAddress,
+                superficie: superficie,
+                materialType: document.getElementById('materialType').value,
+                puitLumiere: document.getElementById('puitLumiere').value,
+                notes: document.getElementById('notes').value,
+                folderId: appData.currentFolder
+            };
+            
+            // Ajouter à la liste
+            appData.submissions.push(submission);
+            
+            // Sauvegarder
+            saveData();
+            
+            // Revenir à la page appropriée
+            if (appData.currentPage === 'dashboard') {
+                renderDashboard();
+            } else {
+                renderSubmissions();
+            }
+        }
+    </script>
+</body>
+</html>
